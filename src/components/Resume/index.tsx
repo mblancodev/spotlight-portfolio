@@ -1,46 +1,49 @@
-import { RoleType } from "@/types"
-import { ArrowDownIcon } from "../Icons/ArrowDownIcon"
-import { Button } from "../Button"
-import { BriefcaseIcon } from "../Icons/BriefcaseIcon"
-import Image from "next/image"
-
-import logoAirbnb from '@/images/logos/airbnb.svg'
-import logoFacebook from '@/images/logos/facebook.svg'
-import logoPlanetaria from '@/images/logos/planetaria.svg'
-import logoStarbucks from '@/images/logos/starbucks.svg'
+import { RoleType } from '@/types'
+import { ArrowDownIcon } from '../Icons/ArrowDownIcon'
+import { Button } from '../Button'
+import { BriefcaseIcon } from '../Icons/BriefcaseIcon'
+import { AstrolleIcon } from '../Icons/AstrolleIcon'
+import Infrapedia from '@/images/logos/infrapedia.svg'
+import Edgeuno from '@/images/logos/edgeuno.svg'
+import Agrimanager from '@/images/logos/agrimanager.png'
+import Image, { ImageProps } from 'next/image'
 
 export function Resume() {
   let resume: Array<RoleType> = [
     {
-      company: 'Planetaria',
-      title: 'CEO',
-      logo: logoPlanetaria,
-      start: '2019',
+      company: 'Astrolle Inc',
+      title: 'Co-Founder',
+      // @ts-expect-error x
+      logo: <AstrolleIcon className="text-gray-800 dark:text-white" />,
+      start: '2022',
       end: {
         label: 'Present',
         dateTime: new Date().getFullYear().toString(),
       },
     },
     {
-      company: 'Airbnb',
-      title: 'Product Designer',
-      logo: logoAirbnb,
-      start: '2014',
-      end: '2019',
+      company: 'Edgeuno SAS',
+      title: 'Frontend Developer',
+      logo: Edgeuno,
+      img: true,
+      start: '2024',
+      end: '2022',
     },
     {
-      company: 'Facebook',
-      title: 'iOS Software Engineer',
-      logo: logoFacebook,
-      start: '2011',
-      end: '2014',
+      company: 'Infrapedia Inc',
+      title: 'Software Engineer',
+      logo: Infrapedia,
+      img: true,
+      start: '2020',
+      end: '2022',
     },
     {
-      company: 'Starbucks',
-      title: 'Shift Supervisor',
-      logo: logoStarbucks,
-      start: '2008',
-      end: '2011',
+      company: 'Agrolevels SAS',
+      title: 'Junior Frontend Developer',
+      logo: Agrimanager,
+      img: true,
+      start: '2018',
+      end: '2021',
     },
   ]
 
@@ -74,11 +77,20 @@ function Role({ role }: { role: RoleType }) {
 
   return (
     <li className="flex gap-4">
-      <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
-        <Image src={role.logo} alt="" className="h-7 w-7" unoptimized />
+      <div className="relative mt-1 flex p-1 h-10 w-10 flex-none items-center justify-center rounded-full shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
+        {role.img ? (
+          <Image
+            src={role.logo as ImageProps['src']}
+            alt=""
+            className="h-7 w-7 object-cover object-left"
+            unoptimized
+          />
+        ) : (
+          <>{role.logo}</>
+        )}
       </div>
       <dl className="flex flex-auto flex-wrap gap-x-2">
-        <dt className="sr-only">Company</dt>
+        <dt className="sr-only dark:text-white">Company</dt>
         <dd className="w-full flex-none text-sm font-medium text-zinc-900 dark:text-zinc-100">
           {role.company}
         </dd>
