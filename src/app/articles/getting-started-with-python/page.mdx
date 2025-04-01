@@ -1,0 +1,179 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import PythonImg from './python.jpg'
+
+export const article = {
+  author: 'Manuel Blanco',
+  date: '2019-08-28',
+  title: 'Getting started with Python',
+  description:
+    'Your Python journey starts here. Learn the basics and begin building your coding skills.',
+}
+
+export const metadata = {
+  title: article.title,
+  description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+<Image src={PythonImg} alt="" />
+<small>Photo by <a href="https://unsplash.com/@eugenemagia?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Eugene Uhanov</a> on <a href="https://unsplash.com/photos/a-person-sitting-at-a-desk-with-a-computer-sZSzrvS5DSY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a></small>
+
+When first started with python I noted some patterns that seem to have python and javascript although their syntaxis is quite not the same, you can relate writing python with javascript as a way to learn it way more efficiently. We will be creating a small terminal app so you can learn the basics of python
+
+Goals:
+
+- Learn how to create variables
+- Define functions
+- Use `While` and `For` loops
+- Get input from the user using the terminal
+- Understand range() method
+- Interpolation
+- Use if/else statements
+
+
+Requirements:
+
+- Python -v 3.7.4
+- Code editor - I'll be using VSCode
+- Terminal
+
+Acknowledgments:
+
+I'm a beginner in python so I'm just sharing what I recently learned. In this tutorial, I use a lot of escape characters in case you don't know what they are or you need to remember them:
+
+|Escape character |               How it formats            |
+| --------------- |:---------------------------------------:|
+|       \         |     New line in a multi-line string     |
+|       \         |                Backslash                |
+|       '         |       Apostrophe or single quote        |
+|       "         |               Double quote              |
+|       \n        |                Line break               |
+|       \t        |        Tab (horizontal indentation)     |
+
+
+-----------------------------------------------------------------------------
+
+Go ahead and open your editor of choice and without further, let's start!
+
+We will imagine that we work at a coffee shop and several clients approach us at the same time, and they all want a cup of coffee so we as software developers need to configure out a bot to prepare them as soon as possible because making it ourselves would take much time, and configure it so it can remember each client name for they feel well attended :)
+
+Create a python file and call it as you wish. I'll call it `coffeePrepBot.py`. We will need to:
+- Create a variable for storing clients name's
+- Have a way to know (like a Boolean) when we finished all the requests
+- Make the bot to ask each client for the type of coffee they want and give them the coffee
+
+```python
+coffee_count = 0
+is_done = False
+clients = []
+```
+
+After you created these three variables in the next line copy/paste:
+
+```python
+def get_client_name():
+  return input('How\'s the client name? ')
+```
+ 
+What we did up there was to define a function that returns the name that the client gives up to make up his/her coffee. The `input(string)` method receives a text string for context about what we want.
+
+```python
+def coffee_clients_listing():
+    for coffees in range(0, coffee_count):
+      clients.append(get_client_name())
+```
+
+After defining the `coffee_clients_listing()` function, we notice something new: range()
+
+### What the range() function does?
+
+The range() function returns a series of numbers making it an iterable, and it has two sets of parameters, as follows: `range([start], stop[, step])`
+
+- start: Starting number of the sequence.
+- stop: Generate numbers up to, but not including this number.
+- step: Difference between each number in the sequence.
+
+Example:
+
+Let's say we want to print to the console the numbers from 1 to 5. We create the following variable
+
+```python
+range_numbers = range(1, 6) # number 6 not included
+```
+If we do `print(range_numbers)` we get: `range(1, 6)` but if we use a for loop like so:
+
+```python
+range_numbers = range(1, 6) # number 6 not included
+for num in range_numbers:
+  print(num)
+
+# We get
+-> 1
+-> 2
+-> 3
+-> 4
+-> 5
+```
+
+Ok, let's keep going. We were defining `coffee_clients_listing()`:
+
+```python
+def coffee_clients_listing():
+    for coffees in range(0, coffee_count):
+      clients.append(get_client_name())
+```
+
+What `coffee_clients_listing()` does is that it receives `coffee_count` which is the number of coffees we need to make, and add to the list (or array as you prefer to call them) the name of the client, calling the `get_client_name()` function.
+
+
+In the next line copy/paste the following:
+
+```python
+while not is_coffees_done:
+  coffee_count = int(input('[BOT]: How many coffee\'s you need to make? '))
+  
+  print('\n[BOT]: Bip Bop Bup... Okay! we will create a list \nwith the name of the clients who asked for a coffee \nso we can start preparing them wink wink\n')
+  coffee_clients_listing()
+
+  print('\nWe have the list with all the clients who asked for coffee: ', clients)
+
+  for client in clients:
+    coffee = input(f'\n[BOT]: Hi {client}, we have \n- Expresso\n- Capuchino\n- Late\n-and American \nWhat type of coffee you want? ')
+    print(f'\n[BOT]: Coming out a {coffee} for: {client} :) \n')
+
+  is_coffees_done = input('[BOT]: You need to make more coffees? ')
+  if is_coffees_done.lower() == 'yes': is_coffees_done = False
+  else: is_coffees_done = True
+
+print('That\'s all for me. Call me again when you need me :] bip bup shutting down...')
+```
+
+What we just did:
+
+- We defined a while loop that will run over and over until the variable `is_coffees_done` becomes `True`.
+
+- We're asking each client for their name and saluting then when giving them their coffee back
+
+Interpolation it's done with the `f` property inside the print function. It's a feature of Python v3 `print(f'String {variable} whatever follows...')` You can learn more at the useful resources section.
+
+
+_The last three lines are important because if not the bot would make coffees infinitely, we're saying: hey! ask your supervisor (or whatever) I'm done? or there are more coffees to serve? If yes, we start from the top of the while loop and if not the bot shuts down itself_
+
+
+That's all for now folks! :)
+
+## Conclusion
+
+We learned that in python:
+
+- Variables follow the pattern: `variable_name = value`
+- Functions are declared with : `def myFunction()`
+- Briefly that comments can be made with `#`
+- We can add items to a list(or array) with the method `.append()`
+- How to declare while loops and exit them
+- Use if/else statements
+
+
+Useful resources:
+[Python keywords](https://www.w3schools.com/python/python_ref_keywords.asp), [String interpolation](https://www.programiz.com/python-programming/string-interpolation), [W3schools exercises](https://www.w3schools.com/python/exercise.asp), [W3schools Quiz](https://www.w3schools.com/python/python_quiz.asp), [Programming with Python Playlist - Python Beginners | Microsoft](https://www.youtube.com/playlist?list=PLlrxD0HtieHhS8VzuMCfQD4uJ9yne1mE6)

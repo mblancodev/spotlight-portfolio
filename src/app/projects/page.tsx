@@ -1,50 +1,37 @@
 import { type Metadata } from 'next'
-import Image from 'next/image'
 
 import { Card } from '@/components/Card'
 import { SimpleLayout } from '@/components/SimpleLayout'
-import logoAnimaginary from '@/images/logos/animaginary.svg'
-import logoCosmos from '@/images/logos/cosmos.svg'
-import logoHelioStream from '@/images/logos/helio-stream.svg'
-import logoOpenShuttle from '@/images/logos/open-shuttle.svg'
-import logoPlanetaria from '@/images/logos/planetaria.svg'
 
 const projects = [
   {
-    name: 'Edgeuno',
-    description:
-      'Internet Infrastructure company. Worked on some of the internal software they use for their own company, and some clients.',
-    link: { href: 'https://edgeuno.com/', label: 'edgeuno.com' },
-    logo: logoHelioStream,
+    name: 'Astrolle',
+    description: 'My baby, the star of my eyes. The little racoon that eats away the better of all the tech garbage my brain produces',
+    link: { href: 'https://astrolle.com/', label: 'astrolle.com' },
+    logo: '🚀',
   },
   {
     name: 'Timeline Range Picker',
-    description: 'A reusable Timeline Picker component created in React',
+    description: 'A reusable Timeline Picker component created in React.',
     link: {
       href: 'https://www.npmjs.com/package/@mblancodev/react-ts-timeline-range-picker',
       label: 'npmjs.com',
     },
-    logo: logoCosmos,
+    logo: '🕰️',
   },
   {
     name: 'Infrapedia',
     description:
-      'High performance web animation library, hand-written in optimized WASM.',
+      'Infrapedia is a tool that provides information about network and data center infrastructure.',
     link: { href: 'https://www.infrapedia.com/', label: 'infrapedia.com' },
-    logo: logoAnimaginary,
+    logo: '📔',
   },
   {
     name: 'Amauz Group',
-    description: '3 small websites that I did for a small chain of restaurants',
-    link: { href: 'https://www.amauzgroup.com/', label: 'amauzgroup.com' },
-    logo: logoOpenShuttle,
-  },
-  {
-    name: 'Agrolevels v2',
     description:
-      'This was my first experience as a Frontend Software Developer. It was my first encounter as well with a SaaS application and some many other technologies that I still use in the present.',
-    link: { href: 'https://agrimanager.app/', label: 'agrimanager.app' },
-    logo: logoPlanetaria,
+      '3 small websites that represent the online presence of a restaurant group that offers dining services, online ordering, and events planning.',
+    link: { href: 'https://www.amauzgroup.com/', label: 'amauzgroup.com' },
+    logo: '🍝',
   },
 ]
 
@@ -77,12 +64,7 @@ export default function Projects() {
         {projects.map((project) => (
           <Card as="li" key={project.name}>
             <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
-              <Image
-                src={project.logo}
-                alt=""
-                className="h-8 w-8"
-                unoptimized
-              />
+              {project.logo}
             </div>
             <h2 className="mt-6 text-base font-semibold text-zinc-800 dark:text-zinc-100">
               <Card.Link

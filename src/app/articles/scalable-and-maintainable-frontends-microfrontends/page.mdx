@@ -1,0 +1,215 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import BannerImg from './boxes.jpg'
+
+export const article = {
+  author: 'Manuel Blanco',
+  date: '2023-10-06',
+  title: 'Scalable and Maintainable Frontends: A Deep Dive into Microfrontends and Webpack Module Federation',
+  description:
+    'In this article we will explain the main concepts behind webpack module federation and then we will continue into implementing a series of exposable components (We will explain what that means later on), that will help us have a better frontend architecture.',
+}
+
+export const metadata = {
+  title: article.title,
+  description: article.description,
+}
+
+export default (props) => <ArticleLayout article={article} {...props} />
+
+<Image src={BannerImg} alt="" />
+
+<small>Photo by <a href="https://unsplash.com/@theshubhamdhage?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Shubham Dhage</a> on <a href="https://unsplash.com/photos/a-black-and-white-photo-of-cubes-on-a-black-background-IlUq1ruyv0Q?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a></small>
+
+In this article we will explain the main concepts behind webpack module federation and then we will continue into implementing a series of exposable components (We will explain what that means later on), that will help us have a better frontend architecture.
+
+##### Requisites:
+
+- Git, Github
+- Node, NPM
+- React, JavaScript ES6+
+- How to setup a minimal Webpack configuration
+
+##### Considerations
+
+1. Webpack Module Federation: it is a plugin; <b> It is not included when you first install Webpack itself</b>.
+2. MF => <b>Module Federation</b> (not the other word haha - _sweats in GenZ_)
+3. In order for to get the most out of MF Plugin you need to have your dependencies in sync. Otherwise Webpack is gonna complain about it (You can work around it, but the configuration changes a bit)
+4. This is not a beginners friendly tutorial. Although, I'll explain everything some things may not be fully comprehensible unless you have prior experience in Front End Development.
+
+## Key Concepts
+
+<b>Configuration</b>: You have to be specific about which modules of your application you want to share with other applications and either you want to consume from other applications or not. You'll have a webpack config for each different application.
+
+<b>Remote Entry Points</b>: You've to create a remote entry point, this defines which modules you want to expose for remote use. These modules are packaged separately and made available as a remote entry point.
+
+<b>Consuming Remote Modules</b>: The remote modules are fetched and executed at runtime. You can specify the remote entry points to be loaded asynchronously, and Webpack will take care of loading and managing them.
+
+<b>Runtime Integration</b>: Webpack's runtime takes care of loading and integrating the remote modules. It handles various aspects like loading remote scripts, making remote modules available to the local application, and handling communication between the applications.
+
+<b>Versioning</b>: Module Federation allows you to specify versions for shared modules. This helps ensure that the consuming application gets the correct version of a module and doesn't conflict with other versions used by different parts of your application.
+
+Alright without anything more to add. Let's start coding!
+
+## Setting up the project
+
+I have already created the starter projects we will be working with. You will see why we need two, in the following section.
+
+You can find then here:
+
+<ul>
+<li>
+<a href="https://github.com/mblancodev/MF-host-template" target="_blank">Webpack MF - HOST</a>
+</li>
+<li>
+<a href="https://github.com/mblancodev/MF-remote-template" target="_blank">Webpack MF - REMOTE</a>
+</li>
+</ul>
+
+You will need to create your own repo since these are templates (name them: `host_app` and `remote1` accordingly) and download the required dependencies, once you do that, come back, and we will start getting coding right away.
+
+<img width="590" src="https://media.giphy.com/media/3o7TKUM3IgJBX2as9O/giphy.gif" />
+
+--
+
+## Hello world, w/ microfrontends
+
+You know what is coming, yes! The mighty counter ;) ...
+
+Let's create a button in `remote1` that updates the state inside the host app. Nothing too fancy :)
+
+### Remote1 -- This one would be running in localhost:3000
+
+-- <small>Note: Is important to know where is running what. You'll see why later on :)</small>
+
+Let's start creating our `Button.js` in one of our folders inside `remote1`:
+
+##### Button.js
+
+```
+export const Button = (props) =>
+  <button type="button" onClick={props.onClick}> Click me! </button>
+```
+
+Then we need to expose this component inside our `webpack.config.js` as follow:
+
+##### webpack.config.js
+
+```
+ ...
+  plugins: [
+    ...other_plugins,
+    new ModuleFederationPlugin({
+      name: "app_name", // Change this
+      filename: "remoteEntry.js",
+      exposes: {
+        // your custom components, functions, you wanna expose
+        "./Button.js": "./src/Button.js",
+      },
+      shared: [
+        deps,
+        {
+          react: {
+            eager: true,
+            singleton: true,
+            requiredVersion: deps.react,
+          },
+        },
+        {
+          "react-dom": {
+            eager: true,
+            singleton: true,
+            requiredVersion: deps["react-dom"],
+          },
+        },
+      ],
+    }),
+  ],
+ ...
+```
+
+### HOST_APP -- This would be running in localhost:8080
+
+We switch over to our `host_app`, and inside the `webpack.config.js`, we read from `remote1` at _`localhost:3000`_ the `remoteEntry.js` that exposes:
+
+##### webpack.config.js
+
+```
+...
+plugins: [
+  ...other_plugins,
+  new ModuleFederationPlugin({
+      name: "host", // You can change this if you want :)
+      remotes: {
+        // Your known remotes
+        "remote1": "app_name@http://localhost:3002/remoteEntry.js",
+      },
+      shared: [
+        deps,
+        {
+          react: {
+            eager: true,
+            singleton: true,
+            requiredVersion: deps.react,
+          },
+        },
+        {
+          "react-dom": {
+            eager: true,
+            singleton: true,
+            requiredVersion: deps["react-dom"],
+          },
+        },
+      ],
+    }),
+],
+```
+
+--
+
+Finally, inside our `App.js` in the `host_app` we import the component from the `remote1` app. I know it gets kinda confusing using the terms this app this other app, but please bear with me. I'll leave a `.dio` example file that better explains it (in the resources panel is the link to the extension that allows you read `.dio` files directly from VSCode)
+
+##### App.js
+
+```
+import Button from 'remote1/Button';
+
+const App = () => {
+  const [counter, setCounter] = React.useState(0);
+  return (
+    <div>
+      <h5>Hello from HOST APP</h5>
+      <p>HOST Counter: {counter}</p>
+      <hr />
+      <div class="border border-gray-200 rounded-md">
+        <b>Container for remote components</b>
+        <Button onClick={() => setCounter(counter+1)} />
+      </div>
+    </div>
+  )
+};
+
+export default App;
+```
+
+--
+
+Once we do all of that we can run: `npm run dev` inside each project and everything should be running as expected.
+
+<b>PD:<small> If you run into issues please don't hesitate to message me or leave a comment :) I'll help as soon as I can</small></b>
+
+#### Conclusions
+
+As recap, we created one relatively small component that is being exposed from `remote1` and read from what we called the <b>host</b> application.
+
+That's all for now. Let me know in the comments if this was helpful :).
+
+<img width="420" src="https://media.giphy.com/media/jp2WuL1VB53ZTs5FJo/giphy.gif" />
+
+In PART II we will explore more how to extend an customize the webpack configuration of Module Federation.
+
+#### Resources:
+
+1. https://webpack.js.org/plugins/module-federation-plugin/
+2. https://martinfowler.com/articles/micro-frontends.html
+3. https://www.aplyca.com/en/blog/micro-frontends-what-are-they-and-when-to-use-them
+4. https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio
