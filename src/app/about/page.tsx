@@ -8,7 +8,7 @@ import { SelfPresentation } from '@/components/SelfPresentation'
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'I’m Manuel Blanco. I help other people building the web.',
+  description: "I'm Manuel Blanco. I'm a senior dev and entrepreneur, basically obsessed with building web stuff that helps businesses blow up",
 }
 
 export default function About() {

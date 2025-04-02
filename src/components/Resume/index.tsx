@@ -1,3 +1,5 @@
+'use client'
+
 import { RoleType } from '@/types'
 import { ArrowDownIcon } from '../Icons/ArrowDownIcon'
 import { Button } from '../Button'
@@ -34,7 +36,7 @@ export function Resume() {
       title: 'Software Engineer',
       logo: Infrapedia,
       img: true,
-      start: '2020',
+      start: '2019',
       end: '2022',
     },
     {
@@ -43,9 +45,24 @@ export function Resume() {
       logo: Agrimanager,
       img: true,
       start: '2018',
-      end: '2021',
+      end: '2020',
     },
   ]
+
+  async function downloadCV() {
+    try {
+      const url = '/cv.pdf'
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'CV_Manuel-Blanco.pdf'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Download failed:', error)
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
@@ -58,7 +75,11 @@ export function Resume() {
           <Role key={roleIndex} role={role} />
         ))}
       </ol>
-      <Button href="#" variant="secondary" className="group mt-6 w-full">
+      <Button
+        variant="secondary"
+        onClick={() => downloadCV()}
+        className="group mt-6 w-full"
+      >
         Download CV
         <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
       </Button>
@@ -77,7 +98,7 @@ function Role({ role }: { role: RoleType }) {
 
   return (
     <li className="flex gap-4">
-      <div className="relative mt-1 flex p-1 h-10 w-10 flex-none items-center justify-center rounded-full shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
+      <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full p-1 shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
         {role.img ? (
           <Image
             src={role.logo as ImageProps['src']}
