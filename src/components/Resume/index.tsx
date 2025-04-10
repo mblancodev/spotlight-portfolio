@@ -28,8 +28,8 @@ export function Resume() {
       title: 'Frontend Developer',
       logo: Edgeuno,
       img: true,
-      start: '2024',
-      end: '2022',
+      start: '2022',
+      end: '2024',
     },
     {
       company: 'Infrapedia Inc',
