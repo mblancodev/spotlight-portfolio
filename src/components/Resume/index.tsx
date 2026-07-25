@@ -14,14 +14,22 @@ export function Resume() {
   let resume: Array<RoleType> = [
     {
       company: 'Astrolle Inc',
-      title: 'Co-Founder',
+      title: 'Front End Technical Lead II',
       // @ts-expect-error x
       logo: <AstrolleIcon className="text-gray-800 dark:text-white" />,
-      start: '2022',
+      start: 'Sep 2025',
       end: {
         label: 'Present',
         dateTime: new Date().getFullYear().toString(),
       },
+    },
+    {
+      company: 'Neostella',
+      title: 'Front End Engineer II',
+      // @ts-expect-error x
+      logo: <BriefcaseIcon className="text-gray-800 dark:text-white" />,
+      start: 'May 2025',
+      end: 'Sep 2025',
     },
     {
       company: 'Edgeuno SAS',

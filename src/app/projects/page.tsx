@@ -11,15 +11,6 @@ const projects = [
     logo: '🚀',
   },
   {
-    name: 'Timeline Range Picker',
-    description: 'A reusable Timeline Picker component created in React.',
-    link: {
-      href: 'https://www.npmjs.com/package/@mblancodev/react-ts-timeline-range-picker',
-      label: 'npmjs.com',
-    },
-    logo: '🕰️',
-  },
-  {
     name: 'Infrapedia',
     description:
       'Infrapedia is a tool that provides information about network and data center infrastructure.',
@@ -32,6 +23,25 @@ const projects = [
       '3 small websites that represent the online presence of a restaurant group that offers dining services, online ordering, and events planning.',
     link: { href: 'https://www.amauzgroup.com/', label: 'amauzgroup.com' },
     logo: '🍝',
+  },
+  {
+    name: 'Learn By Play',
+    description:
+      'A free, donation-based platform for learning through play, open to the public.',
+    link: {
+      href: 'https://learn-by-play-dusky.vercel.app/',
+      label: 'learn-by-play-dusky.vercel.app',
+    },
+    logo: '🎲',
+  },
+  {
+    name: 'Curated Lovers',
+    description: 'A paid service currently in the making.',
+    link: {
+      href: 'https://curated-lovers-0-1.vercel.app/',
+      label: 'curated-lovers-0-1.vercel.app',
+    },
+    logo: '💌',
   },
 ]
 

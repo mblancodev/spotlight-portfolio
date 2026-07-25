@@ -1,0 +1,202 @@
+# Scalable and Maintainable Frontends Part II: Extending and Customizing Webpack Module Federation
+
+In [Part I](https://mblanco.dev/articles/scalable-and-maintainable-frontends-microfrontends) we covered the core concepts behind Module Federation (MF) and built the classic "hello world" counter — one `host_app` consuming a `Button` exposed by `remote1`. If you haven't gone through that one yet, go read it first, this picks up right where it left off.
+
+Here we're going past the basics: dynamic remotes, shared dependency strategies that actually matter in production, handling a remote that fails to load, lazy loading, and a few notes on TypeScript.
+
+##### Requisites:
+
+- Everything from Part I
+- The `host_app` / `remote1` projects from Part I up and running
+- Basic knowledge of React Suspense / Error Boundaries
+
+##### Considerations
+
+1. Everything below builds on the templates from Part I: [Webpack MF - HOST](https://github.com/mblancodev/MF-host-template) and [Webpack MF - REMOTE](https://github.com/mblancodev/MF-remote-template).
+2. This is still not a beginner-friendly tutorial. If MF as a concept is new to you, Part I is required reading first.
+
+## 1. Static vs Dynamic Remotes
+
+In Part I, we hardcoded the remote's URL directly in `webpack.config.js`:
+
+```
+remotes: {
+  remote1: "app_name@http://localhost:3002/remoteEntry.js",
+},
+```
+
+That's fine for a tutorial, terrible for real life. Your remote won't always live at `localhost:3002` — it'll have a staging URL, a prod URL, maybe a per-PR preview URL. Hardcoding forces a rebuild of the host every time a remote's address changes, which defeats half the point of microfrontends (independent deployability).
+
+The fix: **dynamic remotes**. Instead of a string, point `remotes` at a promise that resolves the remote's URL at runtime.
+
+##### webpack.config.js (host_app)
+
+```
+plugins: [
+  ...other_plugins,
+  new ModuleFederationPlugin({
+    name: "host",
+    remotes: {
+      remote1: `promise new Promise(resolve => {
+        const remoteUrl = window.__REMOTE1_URL__ || "http://localhost:3002/remoteEntry.js";
+        const script = document.createElement("script");
+        script.src = remoteUrl;
+        script.onload = () => {
+          resolve({
+            get: (request) => window.remote1.get(request),
+            init: (arg) => window.remote1.init(arg),
+          });
+        };
+        document.head.appendChild(script);
+      })`,
+    },
+    shared: [ /* same as before */ ],
+  }),
+],
+```
+
+`window.__REMOTE1_URL__` can be injected however you like — an env var baked in at build time, a value fetched from a config endpoint on app boot, whatever fits your deploy pipeline. Now the host doesn't need to know the remote's URL until runtime.
+
+## 2. Shared Dependencies, For Real This Time
+
+In Part I we shared `react` and `react-dom` with `eager: true, singleton: true`. That's the minimum. In a real app you'll be sharing a lot more — your design system, state management, routing — and each of these flags actually means something:
+
+- **`singleton: true`**: only one copy of this dependency loads across host + all remotes. Use this for anything that breaks when duplicated (React, a global store, a routing context).
+- **`eager: true`**: the dependency is bundled directly instead of loaded async. Necessary for the **host's own entry point**, since MF needs something synchronously available before it can even start resolving remotes. Don't mark every shared dep eager — it defeats code splitting.
+- **`requiredVersion`**: pin this to the version in your `package.json` (usually via `deps.react` if you're importing your `package.json` as `deps`). If a remote ships a version outside this range, Webpack will warn at runtime — better a console warning than two React copies fighting over the DOM.
+- **`strictVersion: true`**: turns that warning into a hard error. Use this once your remotes are owned by different teams and you want CI to actually catch mismatches instead of relying on someone reading a console log.
+
+```
+shared: [
+  deps,
+  {
+    react: {
+      singleton: true,
+      requiredVersion: deps.react,
+      strictVersion: true,
+    },
+  },
+  {
+    "react-dom": {
+      singleton: true,
+      requiredVersion: deps["react-dom"],
+      strictVersion: true,
+    },
+  },
+  {
+    "@your-org/design-system": {
+      singleton: true,
+      requiredVersion: deps["@your-org/design-system"],
+    },
+  },
+],
+```
+
+## 3. Lazy Loading Remote Components
+
+Remote modules are already loaded asynchronously under the hood, but by default your `import` still blocks rendering until it resolves. Wrap it in `React.lazy` + `Suspense` so the rest of the host renders while the remote is still fetching.
+
+##### App.js (host_app)
+
+```
+import React, { Suspense, lazy } from 'react';
+
+const RemoteButton = lazy(() => import('remote1/Button'));
+
+const App = () => {
+  const [counter, setCounter] = React.useState(0);
+  return (
+    <div>
+      <h5>Hello from HOST APP</h5>
+      <p>HOST Counter: {counter}</p>
+      <hr />
+      <div class="border border-gray-200 rounded-md">
+        <b>Container for remote components</b>
+        <Suspense fallback={<p>Loading remote button...</p>}>
+          <RemoteButton onClick={() => setCounter(counter + 1)} />
+        </Suspense>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+```
+
+Small change, big payoff once you have more than one or two remotes on a page.
+
+## 4. What Happens When a Remote Is Down
+
+This is the part most MF tutorials skip, and the first thing that'll bite you in production. If `remote1`'s server is down, or `remoteEntry.js` 404s, `import('remote1/Button')` rejects — and an unhandled rejection inside `React.lazy` will crash the whole host app, not just the spot where the remote was supposed to render.
+
+Wrap every remote-consuming boundary in an **Error Boundary**:
+
+##### RemoteErrorBoundary.js (host_app)
+
+```
+import React from 'react';
+
+export class RemoteErrorBoundary extends React.Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    console.error('Remote failed to load:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? <p>This part of the app is unavailable right now.</p>;
+    }
+    return this.props.children;
+  }
+}
+```
+
+And use it around the `Suspense` boundary from step 3:
+
+```
+<RemoteErrorBoundary fallback={<button disabled>Unavailable</button>}>
+  <Suspense fallback={<p>Loading remote button...</p>}>
+    <RemoteButton onClick={() => setCounter(counter + 1)} />
+  </Suspense>
+</RemoteErrorBoundary>
+```
+
+Now a broken remote degrades gracefully instead of taking down everything around it. This one change is worth more in production than every other tip in this article combined.
+
+## 5. TypeScript and Remote Modules
+
+If your `host_app` is TypeScript, `import Button from 'remote1/Button'` has no types — as far as TS is concerned, `remote1/Button` doesn't exist. Two common ways to deal with it:
+
+**a. Manual ambient declarations** — quick, no extra tooling:
+
+```
+// remote1.d.ts
+declare module 'remote1/Button' {
+  const Button: React.ComponentType<{ onClick: () => void }>;
+  export default Button;
+}
+```
+
+**b. `@module-federation/typescript`** (or similar codegen plugins) — generates these declarations for you by pulling the remote's compiled types at build time, so they stay in sync automatically instead of drifting from what the remote actually exposes. Worth it once you have more than a couple of shared components, painful to maintain by hand past that point.
+
+--
+
+#### Conclusions
+
+We took the Part I setup and made it something you could actually ship: remotes resolved at runtime instead of hardcoded, shared dependencies pinned and versioned on purpose, lazy loading so remotes don't block the host, and error boundaries so a remote going down doesn't take the whole app with it.
+
+None of this is exotic — it's the difference between a demo and a system a team can depend on.
+
+Let me know in the comments if this was helpful, or if there's a specific part of the MF setup you want covered in more depth :)
+
+#### Resources:
+
+1. https://webpack.js.org/plugins/module-federation-plugin/
+2. https://module-federation.io/
+3. https://martinfowler.com/articles/micro-frontends.html
+4. https://react.dev/reference/react/Suspense
