@@ -3,13 +3,20 @@ import Image from 'next/image'
 
 import { Container } from '@/components/Container'
 import portraitImage from '@/images/portrait.png'
-import { SocialLinks } from '@/components/SocialLinks'
 import { SelfPresentation } from '@/components/SelfPresentation'
+import { aboutDescription } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'About',
-  description:
-    "I'm Manuel Blanco. I'm a senior dev and entrepreneur, basically obsessed with building web stuff that helps businesses blow up",
+  description: aboutDescription,
+  openGraph: {
+    title: 'About',
+    description: aboutDescription,
+  },
+  twitter: {
+    title: 'About',
+    description: aboutDescription,
+  },
 }
 
 export default function About() {
@@ -33,9 +40,6 @@ export default function About() {
         </div>
         <div className="lg:order-first lg:row-span-2">
           <SelfPresentation />
-        </div>
-        <div className="lg:pl-20">
-          <SocialLinks altStyles />
         </div>
       </div>
     </Container>

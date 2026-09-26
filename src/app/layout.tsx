@@ -2,20 +2,31 @@ import { type Metadata } from 'next'
 
 import { Providers } from '@/app/providers'
 import { Layout } from '@/components/Layout'
+import { defaultDescription, defaultTitle, siteUrl } from '@/lib/site'
 
 import '@/styles/tailwind.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    template: '%s - Manuel Blanco',
-    default:
-      'Manuel Blanco - Software Developer, Co-Founder, and amateur pianist',
+    template: '%s — Manuel Blanco',
+    default: defaultTitle,
   },
-  description:
-    "I'm Manuel Blanco. I'm a senior dev and entrepreneur, basically obsessed with building web stuff that helps businesses blow up",
+  description: defaultDescription,
+  openGraph: {
+    type: 'website',
+    siteName: 'Manuel Blanco',
+    title: defaultTitle,
+    description: defaultDescription,
+  },
+  twitter: {
+    card: 'summary',
+    title: defaultTitle,
+    description: defaultDescription,
+  },
   alternates: {
     types: {
-      'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL}/feed.xml`,
+      'application/rss+xml': `${siteUrl}/feed.xml`,
     },
   },
 }
@@ -27,12 +38,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
-      <head>
-        <meta
-          name="google-adsense-account"
-          content="ca-pub-8886953151745376"
-        />
-      </head>
       <body className="flex h-full bg-zinc-50 dark:bg-black">
         <Providers>
           <div className="flex w-full">
