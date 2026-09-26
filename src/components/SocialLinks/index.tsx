@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { MailIcon } from '../Icons/MailIcon'
 import { GitHubIcon, LinkedInIcon } from '../SocialIcons'
 import clsx from 'clsx'
+import { contactEmail } from '@/lib/site'
 
 function SocialLink({
   icon: Icon,
@@ -43,14 +44,14 @@ export const SocialLinks = ({ altStyles = false }: { altStyles?: boolean }) => {
       </SocialLink>
       <SocialLink
         icon={MailIcon}
-        href="mailto:manuel@astrolle.com"
+        href={`mailto:${contactEmail}`}
         className={
           altStyles
             ? 'mt-8 inline-flex border-t border-zinc-100 pt-8 text-white dark:border-zinc-700/40'
             : ''
         }
       >
-        {altStyles ? 'manuel[at]astrolle.com' : ''}
+        {altStyles ? contactEmail.replace('@', '[at]') : ''}
       </SocialLink>
     </div>
   )
