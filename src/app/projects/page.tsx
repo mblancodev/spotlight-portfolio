@@ -1,49 +1,12 @@
 import { type Metadata } from 'next'
+import Link from 'next/link'
 
 import { Card } from '@/components/Card'
 import { SimpleLayout } from '@/components/SimpleLayout'
-
-const projects = [
-  {
-    name: 'Astrolle',
-    description: 'My baby, the star of my eyes. The little racoon that eats away the better of all the tech garbage my brain produces',
-    link: { href: 'https://astrolle.com/', label: 'astrolle.com' },
-    logo: '🚀',
-  },
-  {
-    name: 'Infrapedia',
-    description:
-      'Infrapedia is a tool that provides information about network and data center infrastructure.',
-    link: { href: 'https://www.infrapedia.com/', label: 'infrapedia.com' },
-    logo: '📔',
-  },
-  {
-    name: 'Amauz Group',
-    description:
-      '3 small websites that represent the online presence of a restaurant group that offers dining services, online ordering, and events planning.',
-    link: { href: 'https://www.amauzgroup.com/', label: 'amauzgroup.com' },
-    logo: '🍝',
-  },
-  {
-    name: 'Learn By Play',
-    description:
-      'A free, donation-based platform for learning through play, open to the public.',
-    link: {
-      href: 'https://learn-by-play-dusky.vercel.app/',
-      label: 'learn-by-play-dusky.vercel.app',
-    },
-    logo: '🎲',
-  },
-  {
-    name: 'Curated Lovers',
-    description: 'A paid service currently in the making.',
-    link: {
-      href: 'https://curated-lovers-0-1.vercel.app/',
-      label: 'curated-lovers-0-1.vercel.app',
-    },
-    logo: '💌',
-  },
-]
+import { MaybeTodo, Todo } from '@/components/Todo'
+import { getCaseStudy, isCaseStudyPublic } from '@/lib/caseStudies'
+import { projects } from '@/lib/projects'
+import { projectsDescription } from '@/lib/site'
 
 function LinkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
@@ -56,42 +19,138 @@ function LinkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   )
 }
 
+let factClassName = 'text-sm text-zinc-600 break-words dark:text-zinc-400'
+
+let textLinkClassName =
+  'relative z-30 text-sm font-medium text-teal-500 outline-offset-2 transition hover:text-teal-600 focus-visible:text-teal-600'
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="font-medium text-zinc-800 dark:text-zinc-100">{label}</dt>
+      <dd className={factClassName}>
+        <MaybeTodo text={value} />
+      </dd>
+    </div>
+  )
+}
+
+function ExternalOrTodo({ label, value }: { label: string; value: string }) {
+  if (value.includes('TODO(manuel)')) {
+    return (
+      <li className={factClassName}>
+        {label}: <Todo>{value}</Todo>
+      </li>
+    )
+  }
+
+  return (
+    <li>
+      <a
+        href={value}
+        className={textLinkClassName}
+        target="_blank"
+        rel="noreferrer noopener"
+      >
+        {label}
+      </a>
+    </li>
+  )
+}
+
 export const metadata: Metadata = {
   title: 'Projects',
-  description: 'Things I’ve Built That Actually Work',
+  description: projectsDescription,
+  openGraph: {
+    title: 'Projects',
+    description: projectsDescription,
+  },
+  twitter: {
+    title: 'Projects',
+    description: projectsDescription,
+  },
 }
 
 export default function Projects() {
   return (
     <SimpleLayout
       title="Things I’ve Built That Actually Work"
-      intro="I’ve worked on tons of little projects over the years but these are the ones that I’m most proud of. Some of them are open-source, so if you see something that piques your interest, check out the code and contribute if you have ideas for how it can be improved."
+      intro="I’ve worked on a lot of small projects over the years. These are the ones I’m most proud of. A repository is linked on the card only when I have a public URL for it."
     >
       <ul
         role="list"
         className="grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
       >
-        {projects.map((project) => (
-          <Card as="li" key={project.name}>
-            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
-              {project.logo}
-            </div>
-            <h2 className="mt-6 text-base font-semibold text-zinc-800 dark:text-zinc-100">
-              <Card.Link
-                target="_blank"
-                href={project.link.href}
-                rel="noreferrer noopener nofollow"
-              >
-                {project.name}
-              </Card.Link>
-            </h2>
-            <Card.Description>{project.description}</Card.Description>
-            <p className="relative z-10 mt-6 flex text-sm font-medium text-zinc-400 transition group-hover:text-teal-500 dark:text-zinc-200">
-              <LinkIcon className="h-6 w-6 flex-none" />
-              <span className="ml-2">{project.link.label}</span>
-            </p>
-          </Card>
-        ))}
+        {projects.map((project) => {
+          let study = project.caseStudySlug
+            ? getCaseStudy(project.caseStudySlug)
+            : undefined
+          let caseStudyHref =
+            study && isCaseStudyPublic(study)
+              ? `/projects/${study.slug}`
+              : undefined
+
+          return (
+            <Card as="li" key={project.name}>
+              <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white text-sm font-semibold text-zinc-800 shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:text-zinc-100 dark:ring-0">
+                {project.logo}
+              </div>
+              <h2 className="mt-6 text-base font-semibold text-zinc-800 dark:text-zinc-100">
+                {project.link ? (
+                  <Card.Link
+                    target="_blank"
+                    href={project.link.href}
+                    rel="noreferrer noopener nofollow"
+                  >
+                    {project.name}
+                  </Card.Link>
+                ) : caseStudyHref ? (
+                  <Card.Link href={caseStudyHref}>{project.name}</Card.Link>
+                ) : (
+                  project.name
+                )}
+              </h2>
+              <Card.Description>
+                {project.summary.includes('TODO(manuel)') ? (
+                  <Todo>{project.summary}</Todo>
+                ) : (
+                  project.summary
+                )}{' '}
+                {project.summaryTodo && <Todo>{project.summaryTodo}</Todo>}{' '}
+                {project.personality}
+              </Card.Description>
+              <dl className="relative z-10 mt-4 space-y-3">
+                <Fact label="Role" value={project.role} />
+                <Fact label="Stack" value={project.stack} />
+                <Fact label="Outcome" value={project.outcome} />
+              </dl>
+              {project.link && (
+                <p className="relative z-10 mt-6 flex text-sm font-medium text-zinc-400 transition group-hover:text-teal-500 dark:text-zinc-200">
+                  <LinkIcon className="h-6 w-6 flex-none" />
+                  <span className="ml-2 break-all">{project.link.label}</span>
+                </p>
+              )}
+              <ul className="relative z-30 mt-4 flex flex-col gap-2">
+                {caseStudyHref && (
+                  <li>
+                    <Link href={caseStudyHref} className={textLinkClassName}>
+                      Case study
+                    </Link>
+                  </li>
+                )}
+                {project.repo && (
+                  <ExternalOrTodo label="GitHub" value={project.repo} />
+                )}
+                {project.npm && (
+                  <ExternalOrTodo label="npm" value={project.npm} />
+                )}
+                {project.demo && (
+                  <ExternalOrTodo label="Demo" value={project.demo} />
+                )}
+              </ul>
+            </Card>
+          )
+        })}
       </ul>
     </SimpleLayout>
   )
