@@ -9,14 +9,6 @@ import { aboutDescription } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'About',
   description: aboutDescription,
-  openGraph: {
-    title: 'About',
-    description: aboutDescription,
-  },
-  twitter: {
-    title: 'About',
-    description: aboutDescription,
-  },
 }
 
 export default function About() {

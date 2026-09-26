@@ -16,13 +16,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Manuel Blanco',
-    title: defaultTitle,
-    description: defaultDescription,
   },
   twitter: {
     card: 'summary',
-    title: defaultTitle,
-    description: defaultDescription,
   },
   alternates: {
     types: {

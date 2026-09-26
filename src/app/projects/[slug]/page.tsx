@@ -29,14 +29,6 @@ export function generateMetadata({
     title: study.title,
     description: study.description,
     robots: study.draft ? { index: false, follow: false } : undefined,
-    openGraph: {
-      title: study.title,
-      description: study.description,
-    },
-    twitter: {
-      title: study.title,
-      description: study.description,
-    },
   }
 }
 
