@@ -34,3 +34,18 @@ export async function getAllArticles() {
 
   return articles.sort((a, z) => +new Date(z.date) - +new Date(a.date))
 }
+
+/** Home shows the microfrontends series only. Part II, then Part I. */
+const homeArticleSlugs = [
+  'scalable-and-maintainable-frontends-microfrontends-part-2',
+  'scalable-and-maintainable-frontends-microfrontends',
+]
+
+export async function getHomeArticles() {
+  let articles = await getAllArticles()
+
+  return homeArticleSlugs.flatMap((slug) => {
+    let article = articles.find((item) => item.slug === slug)
+    return article ? [article] : []
+  })
+}

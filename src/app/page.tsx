@@ -1,7 +1,9 @@
 import { Card } from '@/components/Card'
 import { Container } from '@/components/Container'
 
-import { type ArticleWithSlug, getAllArticles } from '@/lib/articles'
+import Link from 'next/link'
+
+import { type ArticleWithSlug, getHomeArticles } from '@/lib/articles'
 import { formatDate } from '@/lib/formatDate'
 import { SelfPresentation } from '@/components/SelfPresentation'
 import { Resume } from '@/components/Resume'
@@ -22,7 +24,7 @@ function Article({ article }: { article: ArticleWithSlug }) {
 }
 
 export default async function Home() {
-  let articles = (await getAllArticles()).slice(0, 4)
+  let articles = await getHomeArticles()
 
   return (
     <>
@@ -35,6 +37,15 @@ export default async function Home() {
             {articles.map((article) => (
               <Article key={article.slug} article={article} />
             ))}
+            <Link
+              href="/articles"
+              className="inline-flex items-center text-sm font-medium text-teal-500 outline-offset-2 transition hover:text-teal-600 focus-visible:text-teal-600"
+            >
+              All articles
+              <span aria-hidden="true" className="ml-1">
+                →
+              </span>
+            </Link>
           </div>
           <div className="space-y-10 lg:pl-16 xl:pl-24">
             <Resume />
