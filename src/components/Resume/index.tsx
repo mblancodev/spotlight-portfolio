@@ -4,7 +4,8 @@ import { RoleType } from '@/types'
 import { ArrowDownIcon } from '../Icons/ArrowDownIcon'
 import { Button } from '../Button'
 import { BriefcaseIcon } from '../Icons/BriefcaseIcon'
-import { AstrolleIcon } from '../Icons/AstrolleIcon'
+import { Todo } from '@/components/Todo'
+import { impactTodo } from '@/lib/site'
 import Infrapedia from '@/images/logos/infrapedia.svg'
 import Edgeuno from '@/images/logos/edgeuno.svg'
 import Agrimanager from '@/images/logos/agrimanager.png'
@@ -14,22 +15,24 @@ export function Resume() {
   let resume: Array<RoleType> = [
     {
       company: 'Astrolle Inc',
-      title: 'Front End Technical Lead II',
-      // @ts-expect-error x
-      logo: <AstrolleIcon className="text-gray-800 dark:text-white" />,
+      title: 'Co-Founder & Frontend Tech Lead',
+      initials: 'A',
       start: 'Sep 2025',
       end: {
         label: 'Present',
         dateTime: new Date().getFullYear().toString(),
       },
+      highlights: [impactTodo],
+      note: 'TODO(manuel): add logo file',
     },
     {
       company: 'Neostella',
       title: 'Front End Engineer II',
-      // @ts-expect-error x
-      logo: <BriefcaseIcon className="text-gray-800 dark:text-white" />,
+      initials: 'N',
       start: 'May 2025',
       end: 'Sep 2025',
+      highlights: [impactTodo],
+      note: 'TODO(manuel): add logo file',
     },
     {
       company: 'Edgeuno SAS',
@@ -38,6 +41,7 @@ export function Resume() {
       img: true,
       start: '2022',
       end: '2024',
+      highlights: [impactTodo],
     },
     {
       company: 'Infrapedia Inc',
@@ -46,6 +50,10 @@ export function Resume() {
       img: true,
       start: '2019',
       end: '2022',
+      highlights: [
+        'Software engineer on a network and data-center infrastructure tool.',
+        impactTodo,
+      ],
     },
     {
       company: 'Agrolevels SAS',
@@ -54,6 +62,8 @@ export function Resume() {
       img: true,
       start: '2018',
       end: '2020',
+      highlights: [impactTodo],
+      note: 'TODO(manuel): confirm dates or note part-time/contract',
     },
   ]
 
@@ -78,7 +88,7 @@ export function Resume() {
         <BriefcaseIcon className="h-6 w-6 flex-none" />
         <span className="pointer-events-none ml-3">Work</span>
       </h2>
-      <ol className="pointer-events-none mt-6 space-y-4">
+      <ol className="mt-6 space-y-4">
         {resume.map((role, roleIndex) => (
           <Role key={roleIndex} role={role} />
         ))}
@@ -91,6 +101,12 @@ export function Resume() {
         Download CV
         <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
       </Button>
+      <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+        <Todo>
+          TODO(manuel): update CV — public/cv.pdf is titled CV-2024 and predates
+          the Astrolle and Neostella roles
+        </Todo>
+      </p>
     </div>
   )
 }
@@ -107,7 +123,7 @@ function Role({ role }: { role: RoleType }) {
   return (
     <li className="flex gap-4">
       <div className="relative mt-1 flex h-10 w-10 flex-none items-center justify-center rounded-full p-1 shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0">
-        {role.img ? (
+        {role.img && role.logo ? (
           <Image
             src={role.logo as ImageProps['src']}
             alt=""
@@ -115,7 +131,9 @@ function Role({ role }: { role: RoleType }) {
             unoptimized
           />
         ) : (
-          <>{role.logo}</>
+          <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-100">
+            {role.initials}
+          </span>
         )}
       </div>
       <dl className="flex flex-auto flex-wrap gap-x-2">
@@ -136,6 +154,26 @@ function Role({ role }: { role: RoleType }) {
           <span aria-hidden="true">—</span>{' '}
           <time dateTime={endDate}>{endLabel}</time>
         </dd>
+        {role.highlights.length > 0 && (
+          <dd className="mt-2 w-full text-xs text-zinc-600 dark:text-zinc-400">
+            <ul className="list-disc space-y-1 pl-4">
+              {role.highlights.map((highlight) => (
+                <li key={highlight} className="break-words">
+                  {highlight.includes('TODO(manuel)') ? (
+                    <Todo>{highlight}</Todo>
+                  ) : (
+                    highlight
+                  )}
+                </li>
+              ))}
+            </ul>
+          </dd>
+        )}
+        {role.note && (
+          <dd className="mt-2 w-full text-xs break-words text-zinc-600 dark:text-zinc-400">
+            <Todo>{role.note}</Todo>
+          </dd>
+        )}
       </dl>
     </li>
   )
