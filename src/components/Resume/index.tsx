@@ -155,18 +155,16 @@ function Role({ role }: { role: RoleType }) {
           <time dateTime={endDate}>{endLabel}</time>
         </dd>
         {role.highlights.length > 0 && (
-          <dd className="mt-2 w-full text-xs text-zinc-600 dark:text-zinc-400">
-            <ul className="list-disc space-y-1 pl-4">
-              {role.highlights.map((highlight) => (
-                <li key={highlight} className="break-words">
-                  {highlight.includes('TODO(manuel)') ? (
-                    <Todo>{highlight}</Todo>
-                  ) : (
-                    highlight
-                  )}
-                </li>
-              ))}
-            </ul>
+          <dd className="mt-2 w-full space-y-2 text-xs break-words text-zinc-600 dark:text-zinc-400">
+            {role.highlights.map((highlight) => (
+              <p key={highlight}>
+                {highlight.includes('TODO(manuel)') ? (
+                  <Todo>{highlight}</Todo>
+                ) : (
+                  highlight
+                )}
+              </p>
+            ))}
           </dd>
         )}
         {role.note && (

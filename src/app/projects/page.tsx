@@ -22,7 +22,7 @@ function LinkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 let factClassName = 'text-sm text-zinc-600 break-words dark:text-zinc-400'
 
 let textLinkClassName =
-  'relative z-30 text-sm font-medium text-teal-500 outline-offset-2 transition hover:text-teal-600 focus-visible:text-teal-600'
+  'relative z-30 inline-flex items-center text-sm font-medium text-teal-500 outline-offset-2 transition hover:text-teal-600 focus-visible:text-teal-600'
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
@@ -61,14 +61,6 @@ function ExternalOrTodo({ label, value }: { label: string; value: string }) {
 export const metadata: Metadata = {
   title: 'Projects',
   description: projectsDescription,
-  openGraph: {
-    title: 'Projects',
-    description: projectsDescription,
-  },
-  twitter: {
-    title: 'Projects',
-    description: projectsDescription,
-  },
 }
 
 export default function Projects() {
@@ -135,6 +127,9 @@ export default function Projects() {
                   <li>
                     <Link href={caseStudyHref} className={textLinkClassName}>
                       Case study
+                      <span aria-hidden="true" className="ml-1">
+                        →
+                      </span>
                     </Link>
                   </li>
                 )}

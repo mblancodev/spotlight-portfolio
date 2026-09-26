@@ -7,7 +7,7 @@ export function Todo({ children }: { children: React.ReactNode }) {
   return (
     <span
       className={clsx(
-        'break-words',
+        'box-decoration-clone break-words',
         dev &&
           'rounded-md bg-teal-400/10 px-1 text-teal-700 dark:text-teal-300',
       )}
