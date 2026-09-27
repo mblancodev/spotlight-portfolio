@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "portfolio-posts": {
+      "command": "node",
+      "args": ["mcp/posts-server.mjs"],
+      "env": {
+        "GITHUB_TOKEN": "${PORTFOLIO_POSTS_TOKEN}"
+      }
+    }
+  }
+}
