@@ -131,7 +131,7 @@ export const projects: Project[] = [
   {
     name: 'Curated Lovers',
     logo: '💌',
-    logoImage: '/projects/curated-lovers-favicon.svg',
+    logoImage: '/projects/curated-lovers-logo.svg',
     summary:
       'Matchmaking without swiping. Human curators vet members and invite them to blind dates and small events. Now in waitlist mode.',
     role: 'Sole developer and product owner',
