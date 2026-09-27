@@ -124,6 +124,12 @@ async function github(path, init = {}) {
     },
   })
   if (response.status === 404) return null
+  if (response.status === 401) {
+    throw new Error(
+      'GitHub rejected the token (401 Bad credentials). Check GITHUB_TOKEN (PORTFOLIO_POSTS_TOKEN in .mcp.json): ' +
+        `a fine-grained token for ${REPO} with Contents: Read and write, not expired or revoked. Restart the MCP server after changing it.`,
+    )
+  }
   if (!response.ok) {
     let detail = await response.text()
     throw new Error(`GitHub ${response.status} on ${path}: ${detail.slice(0, 300)}`)
