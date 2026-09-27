@@ -1,75 +1,184 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
+import { flushSync } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
-import {
-  Popover,
-  PopoverButton,
-  PopoverBackdrop,
-  PopoverPanel,
-} from '@headlessui/react'
 import clsx from 'clsx'
 
-import { Container } from '@/components/Container'
-import avatarImage from '@/images/avatar.jpg'
+import { currentTime, onNote, start, stop } from '@/lib/ambient-night'
 
-function CloseIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
-      <path
-        d="m17.25 6.75-10.5 10.5M6.75 6.75l10.5 10.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/work-experience', label: 'Work' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/articles', label: 'Articles' },
+  { href: '/about', label: 'About' },
+]
+
+function isActive(pathname: string, href: string) {
+  if (href === '/') return pathname === '/'
+  return pathname === href || pathname.startsWith(`${href}/`)
 }
 
-function ChevronDownIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
-  return (
-    <svg viewBox="0 0 8 6" aria-hidden="true" {...props}>
-      <path
-        d="M1.75 1.75 4 4.25l2.25-2.5"
-        fill="none"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function SunIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
+function SunIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      strokeWidth="1.5"
+      aria-hidden="true"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
     >
-      <path d="M8 12.25A4.25 4.25 0 0 1 12.25 8v0a4.25 4.25 0 0 1 4.25 4.25v0a4.25 4.25 0 0 1-4.25 4.25v0A4.25 4.25 0 0 1 8 12.25v0Z" />
-      <path
-        d="M12.25 3v1.5M21.5 12.25H20M18.791 18.791l-1.06-1.06M18.791 5.709l-1.06 1.06M12.25 20v1.5M4.5 12.25H3M6.77 6.77 5.709 5.709M6.77 17.73l-1.061 1.061"
-        fill="none"
-      />
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
     </svg>
   )
 }
 
-function MoonIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
+function MoonIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+    </svg>
+  )
+}
+
+function rotatePoint(x: number, y: number, cssDeg: number) {
+  let a = (-cssDeg * Math.PI) / 180
+  let cos = Math.cos(a)
+  let sin = Math.sin(a)
+  let dx = x - 12
+  let dy = y - 12
+  return [12 + dx * cos - dy * sin, 12 + dx * sin + dy * cos]
+}
+
+/** Triangle outline, tip last-to-first, so each point has a short trip to the wave. */
+function trianglePoints(cssDeg: number) {
+  let verts = [
+    [9, 6.2],
+    [19, 12],
+    [9, 17.8],
+  ].map(([x, y]) => rotatePoint(x, y, cssDeg))
+  let points: number[][] = []
+  let perEdge = 9
+  for (let edge = 0; edge < 2; edge++) {
+    let from = verts[edge]
+    let to = verts[edge + 1]
+    for (let step = 0; step < perEdge; step++) {
+      let u = step / perEdge
+      points.push([
+        from[0] + (to[0] - from[0]) * u,
+        from[1] + (to[1] - from[1]) * u,
+      ])
+    }
+  }
+  return points
+}
+
+function MusicMark({ angle, active }: { angle: number; active: boolean }) {
+  let pathRef = useRef<SVGPathElement>(null)
+  let angleRef = useRef(angle)
+  let activeRef = useRef(active)
+  angleRef.current = angle
+  activeRef.current = active
+
+  useEffect(() => {
+    // Each bell note becomes a pulse, released when its audio time arrives.
+    let pending: { time: number; velocity: number }[] = []
+    let pulse = 0
+    let unsubscribe = onNote((_midi, velocity, time) => {
+      pending.push({ time, velocity })
+    })
+    let blend = 0
+    let from = 0
+    let to = 0
+    let since = performance.now()
+    let level = 0
+    let frame = 0
+    let reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    function draw(now: number) {
+      let target = activeRef.current ? 1 : 0
+      if (target !== to) {
+        from = blend
+        to = target
+        since = now
+      }
+      let u = reduce ? 1 : Math.min(1, Math.max(0, (now - since) / 520))
+      let eased = u * u * (3 - 2 * u)
+      blend = from + (to - from) * eased
+      let t = blend
+
+      let audioNow = currentTime()
+      while (pending.length && pending[0].time <= audioNow) {
+        pulse = Math.max(pulse, pending.shift()!.velocity)
+      }
+      if (t > 0) {
+        level += (pulse - level) * (pulse > level ? 0.04 : 0.02)
+        pulse *= 0.97
+      } else {
+        level += (0 - level) * 0.08
+        pending = []
+        pulse = 0
+      }
+
+      let phase = reduce ? 0 : (now / 1000) * 0.85
+      let amp = (3.6 + level * 2.4) * t
+      let play = trianglePoints(angleRef.current * (1 - t))
+      let d = ''
+      for (let i = 0; i < 18; i++) {
+        let waveX = 1.5 + (i / 17) * 21
+        let waveY = 12 + Math.sin(i * 0.58 + phase) * amp
+        let x = play[i][0] + (waveX - play[i][0]) * t
+        let y = play[i][1] + (waveY - play[i][1]) * t
+        d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`
+      }
+      if (t < 0.55) d += 'Z'
+
+      let path = pathRef.current
+      if (path) {
+        path.setAttribute('d', d)
+        path.setAttribute(
+          'fill-opacity',
+          (1 - Math.min(1, t / 0.65)).toFixed(3),
+        )
+        path.setAttribute('stroke-opacity', Math.min(1, t / 0.35).toFixed(3))
+      }
+      frame = requestAnimationFrame(draw)
+    }
+
+    frame = requestAnimationFrame(draw)
+    return () => {
+      cancelAnimationFrame(frame)
+      unsubscribe()
+    }
+  }, [])
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="nav-music-icon h-4 w-5"
+    >
       <path
-        d="M17.25 16.22a6.937 6.937 0 0 1-9.47-9.47 7.451 7.451 0 1 0 9.47 9.47ZM12.75 7C17 7 17 2.75 17 2.75S17 7 21.25 7C17 7 17 11.25 17 11.25S17 7 12.75 7Z"
-        strokeWidth="1.5"
+        ref={pathRef}
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.75"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -77,372 +186,164 @@ function MoonIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   )
 }
 
-function MobileNavItem({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
-  return (
-    <li>
-      <PopoverButton as={Link} href={href} className="block py-2">
-        {children}
-      </PopoverButton>
-    </li>
-  )
-}
-
-function MobileNavigation(
-  props: React.ComponentPropsWithoutRef<typeof Popover>,
-) {
-  return (
-    <Popover {...props}>
-      <PopoverButton className="group flex items-center rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-zinc-800 ring-1 shadow-lg shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10 dark:hover:ring-white/20">
-        Menu
-        <ChevronDownIcon className="ml-3 h-auto w-2 stroke-zinc-500 group-hover:stroke-zinc-700 dark:group-hover:stroke-zinc-400" />
-      </PopoverButton>
-      <PopoverBackdrop
-        transition
-        className="fixed inset-0 z-50 bg-zinc-800/40 backdrop-blur-xs duration-150 data-closed:opacity-0 data-enter:ease-out data-leave:ease-in dark:bg-black/80"
-      />
-      <PopoverPanel
-        focus
-        transition
-        className="fixed inset-x-4 top-8 z-50 origin-top rounded-3xl bg-white p-8 ring-1 ring-zinc-900/5 duration-150 data-closed:scale-95 data-closed:opacity-0 data-enter:ease-out data-leave:ease-in dark:bg-zinc-900 dark:ring-zinc-800"
-      >
-        <div className="flex flex-row-reverse items-center justify-between">
-          <PopoverButton aria-label="Close menu" className="-m-1 p-1">
-            <CloseIcon className="h-6 w-6 text-zinc-500 dark:text-zinc-400" />
-          </PopoverButton>
-          <h2 className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            Navigation
-          </h2>
-        </div>
-        <nav className="mt-6">
-          <ul className="-my-2 divide-y divide-zinc-100 text-base text-zinc-800 dark:divide-zinc-100/5 dark:text-zinc-300">
-            <MobileNavItem href="/about">About</MobileNavItem>
-            <MobileNavItem href="/articles">Articles</MobileNavItem>
-            <MobileNavItem href="/projects">Projects</MobileNavItem>
-            {/* <MobileNavItem href="/speaking">Speaking</MobileNavItem> */}
-            {/* <MobileNavItem href="/uses">Uses</MobileNavItem> */}
-          </ul>
-        </nav>
-      </PopoverPanel>
-    </Popover>
-  )
-}
-
-function NavItem({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
-  let isActive = usePathname() === href
-
-  return (
-    <li>
-      <Link
-        href={href}
-        className={clsx(
-          'relative block px-3 py-2 transition',
-          isActive
-            ? 'text-teal-500 dark:text-teal-400'
-            : 'hover:text-teal-500 dark:hover:text-teal-400',
-        )}
-      >
-        {children}
-        {isActive && (
-          <span className="absolute inset-x-1 -bottom-px h-px bg-linear-to-r from-teal-500/0 via-teal-500/40 to-teal-500/0 dark:from-teal-400/0 dark:via-teal-400/40 dark:to-teal-400/0" />
-        )}
-      </Link>
-    </li>
-  )
-}
-
-function DesktopNavigation(props: React.ComponentPropsWithoutRef<'nav'>) {
-  return (
-    <nav {...props}>
-      <ul className="flex rounded-full bg-white/90 px-3 text-sm font-medium text-zinc-800 ring-1 shadow-lg shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10">
-        <NavItem href="/about">About</NavItem>
-        <NavItem href="/articles">Articles</NavItem>
-        <NavItem href="/projects">Projects</NavItem>
-        {/* <NavItem href="/speaking">Speaking</NavItem> */}
-        {/* <NavItem href="/uses">Uses</NavItem> */}
-      </ul>
-    </nav>
-  )
+function applyThemeClass(theme: 'light' | 'dark') {
+  let root = document.documentElement
+  root.classList.remove('light', 'dark')
+  root.classList.add(theme)
+  root.style.colorScheme = theme
 }
 
 function ThemeToggle() {
   let { resolvedTheme, setTheme } = useTheme()
-  let otherTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
   let [mounted, setMounted] = useState(false)
+  let revealing = useRef(false)
+  let otherTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'light' : 'dark'
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  function toggleTheme(event: React.MouseEvent<HTMLButtonElement>) {
+    if (revealing.current) return
+
+    let nextTheme = otherTheme
+    let reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+    let button = event.currentTarget
+    let reveal = document.startViewTransition?.bind(document)
+
+    let update = () => {
+      applyThemeClass(nextTheme)
+      flushSync(() => setTheme(nextTheme))
+    }
+
+    if (!reveal || reduceMotion) {
+      update()
+      return
+    }
+
+    let rect = button.getBoundingClientRect()
+    let x = rect.left + rect.width / 2
+    let y = rect.top + rect.height / 2
+    let startRadius = rect.width / 2
+    let endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    )
+
+    revealing.current = true
+    let transition
+    try {
+      transition = reveal(() => {
+        update()
+      })
+    } catch {
+      revealing.current = false
+      return
+    }
+
+    transition.ready
+      .then(() => {
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(${startRadius}px at ${x}px ${y}px)`,
+              `circle(${endRadius}px at ${x}px ${y}px)`,
+            ],
+          },
+          {
+            duration: 700,
+            easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+            pseudoElement: '::view-transition-new(root)',
+          },
+        )
+      })
+      .catch(() => {})
+
+    transition.finished.finally(() => {
+      revealing.current = false
+    })
+  }
+
   return (
     <button
       type="button"
       aria-label={mounted ? `Switch to ${otherTheme} theme` : 'Toggle theme'}
-      className="group rounded-full bg-white/90 px-3 py-2 ring-1 shadow-lg shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm transition dark:bg-zinc-800/90 dark:ring-white/10 dark:hover:ring-white/20"
-      onClick={() => setTheme(otherTheme)}
+      className="focus-ring relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background ring-1 ring-foreground/8"
+      onClick={toggleTheme}
     >
-      <SunIcon className="h-6 w-6 fill-zinc-100 stroke-zinc-500 transition group-hover:fill-zinc-200 group-hover:stroke-zinc-700 dark:hidden [@media(prefers-color-scheme:dark)]:fill-teal-50 [@media(prefers-color-scheme:dark)]:stroke-teal-500 [@media(prefers-color-scheme:dark)]:group-hover:fill-teal-50 [@media(prefers-color-scheme:dark)]:group-hover:stroke-teal-600" />
-      <MoonIcon className="hidden h-6 w-6 fill-zinc-700 stroke-zinc-500 transition dark:block [@media_not_(prefers-color-scheme:dark)]:fill-teal-400/10 [@media_not_(prefers-color-scheme:dark)]:stroke-teal-500 [@media(prefers-color-scheme:dark)]:group-hover:stroke-zinc-400" />
+      {mounted && resolvedTheme === 'dark' ? <SunIcon /> : <MoonIcon />}
     </button>
   )
 }
 
-function clamp(number: number, a: number, b: number) {
-  let min = Math.min(a, b)
-  let max = Math.max(a, b)
-  return Math.min(Math.max(number, min), max)
-}
+function MusicToggle({ angle }: { angle: number }) {
+  let [active, setActive] = useState(false)
 
-function AvatarContainer({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
-  return (
-    <div
-      className={clsx(
-        className,
-        'h-10 w-10 rounded-full bg-white/90 p-0.5 ring-1 shadow-lg shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:ring-white/10',
-      )}
-      {...props}
-    />
-  )
-}
+  // Generative ambience from the Web Audio API; start() needs this click as its user gesture.
+  function toggle() {
+    let next = !active
+    setActive(next)
+    if (next) start().catch(() => setActive(false))
+    else stop()
+  }
 
-function Avatar({
-  large = false,
-  className,
-  ...props
-}: Omit<React.ComponentPropsWithoutRef<typeof Link>, 'href'> & {
-  large?: boolean
-}) {
   return (
-    <Link
-      href="/"
-      aria-label="Home"
-      className={clsx(className, 'pointer-events-auto')}
-      {...props}
+    <button
+      type="button"
+      aria-label={active ? 'Pause music' : 'Play music'}
+      aria-pressed={active}
+      className="nav-music focus-ring inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-foreground"
+      onClick={toggle}
     >
-      <Image
-        src={avatarImage}
-        alt=""
-        sizes={large ? '4rem' : '2.25rem'}
-        className={clsx(
-          'rounded-full bg-zinc-100 object-cover dark:bg-zinc-800',
-          large ? 'h-16 w-16' : 'h-9 w-9',
-        )}
-        priority
-      />
-    </Link>
+      <MusicMark angle={angle} active={active} />
+    </button>
   )
 }
 
 export function Header() {
-  let isHomePage = usePathname() === '/'
-
-  let headerRef = useRef<React.ElementRef<'div'>>(null)
-  let avatarRef = useRef<React.ElementRef<'div'>>(null)
-  let isInitial = useRef(true)
-
-  useEffect(() => {
-    let downDelay = avatarRef.current?.offsetTop ?? 0
-    let upDelay = 64
-
-    function setProperty(property: string, value: string) {
-      document.documentElement.style.setProperty(property, value)
-    }
-
-    function removeProperty(property: string) {
-      document.documentElement.style.removeProperty(property)
-    }
-
-    function updateHeaderStyles() {
-      if (!headerRef.current) {
-        return
-      }
-
-      let { top, height } = headerRef.current.getBoundingClientRect()
-      let scrollY = clamp(
-        window.scrollY,
-        0,
-        document.body.scrollHeight - window.innerHeight,
-      )
-
-      if (isInitial.current) {
-        setProperty('--header-position', 'sticky')
-      }
-
-      setProperty('--content-offset', `${downDelay}px`)
-
-      if (isInitial.current || scrollY < downDelay) {
-        setProperty('--header-height', `${downDelay + height}px`)
-        setProperty('--header-mb', `${-downDelay}px`)
-      } else if (top + height < -upDelay) {
-        let offset = Math.max(height, scrollY - upDelay)
-        setProperty('--header-height', `${offset}px`)
-        setProperty('--header-mb', `${height - offset}px`)
-      } else if (top === 0) {
-        setProperty('--header-height', `${scrollY + height}px`)
-        setProperty('--header-mb', `${-scrollY}px`)
-      }
-
-      if (top === 0 && scrollY > 0 && scrollY >= downDelay) {
-        setProperty('--header-inner-position', 'fixed')
-        removeProperty('--header-top')
-        removeProperty('--avatar-top')
-      } else {
-        removeProperty('--header-inner-position')
-        setProperty('--header-top', '0px')
-        setProperty('--avatar-top', '0px')
-      }
-    }
-
-    function updateAvatarStyles() {
-      if (!isHomePage) {
-        return
-      }
-
-      let fromScale = 1
-      let toScale = 36 / 64
-      let fromX = 0
-      let toX = 2 / 16
-
-      let scrollY = downDelay - window.scrollY
-
-      let scale = (scrollY * (fromScale - toScale)) / downDelay + toScale
-      scale = clamp(scale, fromScale, toScale)
-
-      let x = (scrollY * (fromX - toX)) / downDelay + toX
-      x = clamp(x, fromX, toX)
-
-      setProperty(
-        '--avatar-image-transform',
-        `translate3d(${x}rem, 0, 0) scale(${scale})`,
-      )
-
-      let borderScale = 1 / (toScale / scale)
-      let borderX = (-toX + x) * borderScale
-      let borderTransform = `translate3d(${borderX}rem, 0, 0) scale(${borderScale})`
-
-      setProperty('--avatar-border-transform', borderTransform)
-      setProperty('--avatar-border-opacity', scale === toScale ? '1' : '0')
-    }
-
-    function updateStyles() {
-      updateHeaderStyles()
-      updateAvatarStyles()
-      isInitial.current = false
-    }
-
-    updateStyles()
-    window.addEventListener('scroll', updateStyles, { passive: true })
-    window.addEventListener('resize', updateStyles)
-
-    return () => {
-      window.removeEventListener('scroll', updateStyles)
-      window.removeEventListener('resize', updateStyles)
-    }
-  }, [isHomePage])
+  let pathname = usePathname()
 
   return (
-    <>
-      <header
-        className="pointer-events-none relative z-50 flex flex-none flex-col"
-        style={{
-          height: 'var(--header-height)',
-          marginBottom: 'var(--header-mb)',
-        }}
-      >
-        {isHomePage && (
-          <>
-            <div
-              ref={avatarRef}
-              className="order-last mt-[calc(--spacing(16)-(--spacing(3)))]"
-            />
-            <Container
-              className="top-0 order-last -mb-3 pt-3"
-              style={{
-                position:
-                  'var(--header-position)' as React.CSSProperties['position'],
-              }}
-            >
-              <div
-                className="top-(--avatar-top,--spacing(3)) w-full"
-                style={{
-                  position:
-                    'var(--header-inner-position)' as React.CSSProperties['position'],
-                }}
-              >
-                <div className="relative">
-                  <AvatarContainer
-                    className="absolute top-3 left-0 origin-left transition-opacity"
-                    style={{
-                      opacity: 'var(--avatar-border-opacity, 0)',
-                      transform: 'var(--avatar-border-transform)',
-                    }}
-                  />
-                  <Avatar
-                    large
-                    className="block h-16 w-16 origin-left"
-                    style={{ transform: 'var(--avatar-image-transform)' }}
-                  />
-                </div>
-              </div>
-            </Container>
-          </>
-        )}
-        <div
-          ref={headerRef}
-          className="top-0 z-10 h-16 pt-6"
-          style={{
-            position:
-              'var(--header-position)' as React.CSSProperties['position'],
-          }}
-        >
-          <Container
-            className="top-(--header-top,--spacing(6)) w-full"
-            style={{
-              position:
-                'var(--header-inner-position)' as React.CSSProperties['position'],
-            }}
-          >
-            <div className="relative flex gap-4">
-              <div className="flex flex-1">
-                {!isHomePage && (
-                  <AvatarContainer>
-                    <Avatar />
-                  </AvatarContainer>
-                )}
-              </div>
-              <div className="flex flex-1 justify-end md:justify-center">
-                <MobileNavigation className="pointer-events-auto md:hidden" />
-                <DesktopNavigation className="pointer-events-auto hidden md:block" />
-              </div>
-              <div className="flex justify-end md:flex-1">
-                <div className="pointer-events-auto">
-                  <ThemeToggle />
-                </div>
-              </div>
-            </div>
-          </Container>
+    <nav
+      aria-label="Primary"
+      // w-max: a fixed element at left-1/2 otherwise shrinks to half the viewport.
+      className="fixed top-6 left-1/2 z-50 w-max max-w-[calc(100vw-2rem)] -translate-x-1/2"
+    >
+      <div className="nav-pill relative flex items-center overflow-hidden rounded-full border border-foreground/8 bg-background p-1.5 shadow-sm">
+        <div className="nav-rail">
+          <div className="nav-rail-inner">
+            <ul className="flex items-center gap-0.5 whitespace-nowrap">
+              {links.map((link) => {
+                let active = isActive(pathname, link.href)
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      aria-current={active ? 'page' : undefined}
+                      className={clsx(
+                        'focus-ring inline-flex items-center justify-center rounded-full px-2 py-1.5 text-[13px] font-medium transition-colors sm:px-4 sm:text-sm',
+                        active
+                          ? 'text-foreground'
+                          : 'text-foreground/60 hover:text-foreground',
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
         </div>
-      </header>
-      {isHomePage && (
-        <div
-          className="flex-none"
-          style={{ height: 'var(--content-offset)' }}
-        />
-      )}
-    </>
+        <MusicToggle angle={0} />
+        <div className="nav-rail">
+          <div className="nav-rail-inner nav-theme">
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+    </nav>
   )
 }

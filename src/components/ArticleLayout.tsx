@@ -1,10 +1,10 @@
 'use client'
 
 import { useContext } from 'react'
-import { useRouter } from 'next/navigation'
-
 import { AppContext } from '@/app/providers'
+import { useNativeNav } from '@/lib/useNativeNav'
 import { Container } from '@/components/Container'
+import GlassSurface from '@/components/GlassSurface'
 import { Prose } from '@/components/Prose'
 import { formatDate } from '@/lib/formatDate'
 
@@ -23,49 +23,65 @@ function ArrowLeftIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 
 export function ArticleLayout({
   article,
+  aside,
   children,
 }: {
   article: {
     title: string
     date?: string
   }
+  aside?: React.ReactNode
   children: React.ReactNode
 }) {
-  let router = useRouter()
+  let { go } = useNativeNav()
   let { previousPathname } = useContext(AppContext)
 
   return (
-    <Container className="mt-16 lg:mt-32">
-      <div className="xl:relative">
-        <div className="mx-auto max-w-2xl">
+    <Container>
+      <div>
+        <div className="max-w-2xl">
           {previousPathname && (
             <button
               type="button"
-              onClick={() => router.back()}
+              onClick={() => go(previousPathname, 'back')}
               aria-label="Go back to articles"
-              className="group mb-8 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md ring-1 shadow-zinc-800/5 ring-zinc-900/5 transition lg:absolute lg:-left-5 lg:-mt-2 lg:mb-0 xl:-top-1.5 xl:left-0 xl:mt-0 dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20"
+              className="focus-ring group mb-8 flex h-10 w-10 items-center justify-center rounded-full border border-foreground/8 bg-background transition"
             >
-              <ArrowLeftIcon className="h-4 w-4 stroke-zinc-500 transition group-hover:stroke-zinc-700 dark:stroke-zinc-500 dark:group-hover:stroke-zinc-400" />
+              <ArrowLeftIcon className="h-4 w-4 stroke-foreground/60 transition group-hover:stroke-foreground" />
             </button>
           )}
-          <article>
+          <article className="relative">
             <header className="flex flex-col">
-              <h1 className="mt-6 text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+              <h1 className="mt-6 font-serif text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
                 {article.title}
               </h1>
               {article.date && (
                 <time
                   dateTime={article.date}
-                  className="order-first flex items-center text-base text-zinc-400 dark:text-zinc-500"
+                  className="order-first text-sm tracking-tight text-foreground/50"
                 >
-                  <span className="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500" />
-                  <span className="ml-3">{formatDate(article.date)}</span>
+                  {formatDate(article.date)}
                 </time>
               )}
             </header>
-            <Prose className="mt-8" data-mdx-content>
-              {children}
-            </Prose>
+            <GlassSurface borderRadius={24} refraction={false} className="mt-8">
+              {/* Trim the outer margins so the panel padding sets the spacing. */}
+              <Prose
+                className="px-6 py-8 sm:px-10 [&>:first-child]:mt-0 [&>:first-child>:first-child]:mt-0 [&>:last-child]:mb-0 [&>:last-child>:last-child]:mb-0"
+                data-mdx-content
+              >
+                {children}
+              </Prose>
+            </GlassSurface>
+            {aside && (
+              // Right of the 42rem column to the viewport edge (less scrollbar), from
+              // the title down to the end of the panel. Sticks below the nav on scroll.
+              <div className="absolute top-6 bottom-0 left-full hidden w-[calc(80vw-42rem-1.25rem)] xl:block">
+                <div className="sticky top-28 h-[calc(100vh-7rem)]">
+                  {aside}
+                </div>
+              </div>
+            )}
           </article>
         </div>
       </div>

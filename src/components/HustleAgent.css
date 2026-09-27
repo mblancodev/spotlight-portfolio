@@ -1,0 +1,84 @@
+/* Ported from HustlePocket's AgentIcon (job-hunt-dashboard/frontend/src/components/AgentIcon.tsx). */
+.agent-icon-body #eyes path {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agent-blink 4.4s ease-in-out infinite;
+}
+.agent-icon[data-hop] {
+  position: relative;
+  display: inline-block;
+}
+.agent-icon .agent-icon-body {
+  position: relative;
+  z-index: 1;
+  transform-origin: center bottom;
+  animation: agent-breathe 4.8s ease-in-out infinite;
+}
+.agent-icon[data-hop] .agent-icon-body {
+  animation:
+    agent-enter 1s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both,
+    agent-breathe-landed 4.8s ease-in-out 1.12s infinite;
+}
+.agent-icon[data-hop] .agent-icon-body #eyes path {
+  animation: agent-blink-slow 8.5s ease-in-out infinite;
+}
+.agent-icon-cast {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transform-origin: 52% 94%;
+  filter: brightness(0) blur(4px);
+  animation:
+    agent-cast 1s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both,
+    agent-cast-breathe 4.8s ease-in-out 1.12s infinite;
+}
+.agent-icon-cast svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@keyframes agent-blink {
+  0%, 86%, 100% { transform: scaleY(1); }
+  89%, 91% { transform: scaleY(0.08); }
+  92.5% { transform: scaleY(1); }
+  94.5%, 96% { transform: scaleY(0.08); }
+}
+@keyframes agent-blink-slow {
+  0%, 93%, 100% { transform: scaleY(1); }
+  95%, 97% { transform: scaleY(0.08); }
+}
+@keyframes agent-enter {
+  0% { transform: translate(220px, 6px) scaleX(0.96) scaleY(0.92); }
+  28% { transform: translate(110px, -28px) scaleX(0.94) scaleY(1.1); }
+  42% { transform: translate(88px, 10px) scaleX(1.12) scaleY(0.82); }
+  70% { transform: translate(18px, -22px) scaleX(0.94) scaleY(1.1); }
+  86% { transform: translate(2px, 8px) scaleX(1.12) scaleY(0.84); }
+  100% { transform: translate(0, 0) scaleX(1.02) scaleY(0.98); }
+}
+@keyframes agent-cast {
+  0% { transform: translate(220px, 6px) scaleX(0.82) scaleY(0.14); opacity: 0.18; }
+  28% { transform: translate(110px, 6px) scaleX(0.62) scaleY(0.08); opacity: 0.1; }
+  42% { transform: translate(88px, 6px) scaleX(1.1) scaleY(0.2); opacity: 0.34; }
+  70% { transform: translate(18px, 6px) scaleX(0.62) scaleY(0.08); opacity: 0.1; }
+  86% { transform: translate(2px, 6px) scaleX(1.12) scaleY(0.2); opacity: 0.34; }
+  100% { transform: translate(0, 6px) scaleX(1.02) scaleY(0.16); opacity: 0.28; }
+}
+@keyframes agent-breathe {
+  0%, 100% { transform: scaleX(1) scaleY(1); }
+  50% { transform: scaleX(0.995) scaleY(1.012); }
+}
+@keyframes agent-breathe-landed {
+  0%, 100% { transform: translate(0, 0) scaleX(1.02) scaleY(0.98); }
+  50% { transform: translate(0, -1px) scaleX(1.015) scaleY(0.99); }
+}
+@keyframes agent-cast-breathe {
+  0%, 100% { transform: translate(0, 6px) scaleX(1.02) scaleY(0.16); opacity: 0.28; }
+  50% { transform: translate(0, 6px) scaleX(1.01) scaleY(0.15); opacity: 0.22; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .agent-icon .agent-icon-body,
+  .agent-icon-body #eyes path,
+  .agent-icon-cast { animation: none; }
+  .agent-icon-cast { transform: translate(0, 6px) scaleX(1.02) scaleY(0.16); opacity: 0.28; }
+}

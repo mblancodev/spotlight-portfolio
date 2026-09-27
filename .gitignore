@@ -33,3 +33,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# CV uploaded in local dev (production copies live in Netlify Blobs)
+/data

@@ -4,13 +4,13 @@ import BannerImg from '../scalable-and-maintainable-frontends-microfrontends/box
 export const article = {
   author: 'Manuel Blanco',
   date: '2026-07-25',
-  title: 'Scalable and Maintainable Frontends Part II: Extending and Customizing Webpack Module Federation',
+  title: 'Microfrontends with Module Federation, Part II: Dynamic Remotes and Production Patterns',
   description:
-    'Part II of the microfrontends series. We go past the basics from Part I: dynamic remotes, shared dependency strategies that actually matter in production, lazy loading, error boundaries for remotes that fail to load, and TypeScript support.',
+    'Dynamic remotes, shared dependencies that hold up in production, lazy loading, error boundaries for remotes that fail, and TypeScript support.',
 }
 
 export const metadata = {
-  title: article.title,
+  title: 'Microfrontends, Part II: Dynamic Remotes',
   description: article.description,
 }
 
@@ -24,13 +24,13 @@ In [Part I](/articles/scalable-and-maintainable-frontends-microfrontends) we cov
 
 Here we're going past the basics: dynamic remotes, shared dependency strategies that actually matter in production, handling a remote that fails to load, lazy loading, and a few notes on TypeScript.
 
-##### Requisites:
+### Requisites
 
 - Everything from Part I
 - The `host_app` / `remote1` projects from Part I up and running
 - Basic knowledge of React Suspense / Error Boundaries
 
-##### Considerations
+### Considerations
 
 1. Everything below builds on the templates from Part I: <a href="https://github.com/mblancodev/MF-host-template" target="_blank">Webpack MF - HOST</a> and <a href="https://github.com/mblancodev/MF-remote-template" target="_blank">Webpack MF - REMOTE</a>.
 2. This is still not a beginner-friendly tutorial. If MF as a concept is new to you, Part I is required reading first.

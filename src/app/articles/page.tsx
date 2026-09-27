@@ -1,13 +1,14 @@
 import { type Metadata } from 'next'
 
 import { Card } from '@/components/Card'
+import GlassSurface from '@/components/GlassSurface'
 import { SimpleLayout } from '@/components/SimpleLayout'
 import { type ArticleWithSlug, getAllArticles } from '@/lib/articles'
 import { formatDate } from '@/lib/formatDate'
 
 function Article({ article }: { article: ArticleWithSlug }) {
   return (
-    <article className="md:grid md:grid-cols-4 md:items-baseline">
+    <article className="article-card md:grid md:grid-cols-4 md:items-baseline">
       <Card className="md:col-span-3">
         <Card.Title href={`/articles/${article.slug}`}>
           {article.title}
@@ -37,7 +38,7 @@ function Article({ article }: { article: ArticleWithSlug }) {
 export const metadata: Metadata = {
   title: 'Articles',
   description:
-    'All of my long-form thoughts on programming, leadership, product design, and more, collected in chronological order.',
+    'Articles on frontend architecture and Webpack Module Federation, plus early tutorials on Bash and Python.',
 }
 
 export default async function ArticlesIndex() {
@@ -45,16 +46,17 @@ export default async function ArticlesIndex() {
 
   return (
     <SimpleLayout
-      title="Coding Career Articles"
-      intro="A personal collection of self-made tutorials that help me better understand some concepts and I think can help you in your development career."
+      title="Writing"
+      intro="Practical write-ups on frontend architecture, plus a few tutorials from when I was starting out."
     >
-      <div className="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
-        <div className="flex max-w-3xl flex-col space-y-16">
+      <GlassSurface borderRadius={24} className="max-w-3xl">
+        {/* Padding clears the cards' hover glass, which extends 24px out. */}
+        <div className="flex flex-col space-y-16 px-8 py-10 sm:px-10">
           {articles.map((article) => (
             <Article key={article.slug} article={article} />
           ))}
         </div>
-      </div>
+      </GlassSurface>
     </SimpleLayout>
   )
 }

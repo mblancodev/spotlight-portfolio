@@ -31,10 +31,11 @@ export default {
         css: {
           '--tw-prose-body': theme('colors.zinc.600'),
           '--tw-prose-headings': theme('colors.zinc.900'),
-          '--tw-prose-links': theme('colors.teal.500'),
-          '--tw-prose-links-hover': theme('colors.teal.600'),
-          '--tw-prose-underline': theme('colors.teal.500 / 0.2'),
-          '--tw-prose-underline-hover': theme('colors.teal.500'),
+          '--tw-prose-links': 'var(--foreground)',
+          '--tw-prose-links-hover': 'var(--foreground)',
+          '--tw-prose-underline':
+            'color-mix(in srgb, var(--foreground) 25%, transparent)',
+          '--tw-prose-underline-hover': 'var(--foreground)',
           '--tw-prose-bold': theme('colors.zinc.900'),
           '--tw-prose-counters': theme('colors.zinc.900'),
           '--tw-prose-bullets': theme('colors.zinc.900'),
@@ -51,10 +52,11 @@ export default {
 
           '--tw-prose-invert-body': theme('colors.zinc.400'),
           '--tw-prose-invert-headings': theme('colors.zinc.200'),
-          '--tw-prose-invert-links': theme('colors.teal.400'),
-          '--tw-prose-invert-links-hover': theme('colors.teal.400'),
-          '--tw-prose-invert-underline': theme('colors.teal.400 / 0.3'),
-          '--tw-prose-invert-underline-hover': theme('colors.teal.400'),
+          '--tw-prose-invert-links': 'var(--foreground)',
+          '--tw-prose-invert-links-hover': 'var(--foreground)',
+          '--tw-prose-invert-underline':
+            'color-mix(in srgb, var(--foreground) 30%, transparent)',
+          '--tw-prose-invert-underline-hover': 'var(--foreground)',
           '--tw-prose-invert-bold': theme('colors.zinc.200'),
           '--tw-prose-invert-counters': theme('colors.zinc.200'),
           '--tw-prose-invert-bullets': theme('colors.zinc.200'),
@@ -73,8 +75,8 @@ export default {
           color: 'var(--tw-prose-body)',
           lineHeight: theme('lineHeight.7'),
           '> *': {
-            marginTop: theme('spacing.10'),
-            marginBottom: theme('spacing.10'),
+            marginTop: theme('spacing.8'),
+            marginBottom: theme('spacing.8'),
           },
           p: {
             marginTop: theme('spacing.7'),
@@ -89,13 +91,13 @@ export default {
           h2: {
             fontSize: theme('fontSize.xl')[0],
             lineHeight: theme('lineHeight.7'),
-            marginTop: theme('spacing.20'),
+            marginTop: theme('spacing.12'),
             marginBottom: theme('spacing.4'),
           },
           h3: {
             fontSize: theme('fontSize.base')[0],
             lineHeight: theme('lineHeight.7'),
-            marginTop: theme('spacing.16'),
+            marginTop: theme('spacing.10'),
             marginBottom: theme('spacing.4'),
           },
           ':is(h2, h3) + *': {
@@ -172,8 +174,8 @@ export default {
             paddingLeft: theme('spacing.6'),
           },
           li: {
-            marginTop: theme('spacing.6'),
-            marginBottom: theme('spacing.6'),
+            marginTop: theme('spacing.3'),
+            marginBottom: theme('spacing.3'),
             paddingLeft: theme('spacing[3.5]'),
           },
           'li::marker': {

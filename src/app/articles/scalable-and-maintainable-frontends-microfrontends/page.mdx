@@ -4,13 +4,13 @@ import BannerImg from './boxes.jpg'
 export const article = {
   author: 'Manuel Blanco',
   date: '2023-10-06',
-  title: 'Scalable and Maintainable Frontends: A Deep Dive into Microfrontends and Webpack Module Federation',
+  title: 'Microfrontends with Module Federation, Part I: The Fundamentals',
   description:
-    'In this article we will explain the main concepts behind webpack module federation and then we will continue into implementing a series of exposable components (We will explain what that means later on), that will help us have a better frontend architecture.',
+    'What Module Federation is, why it matters for large frontends, and how to build a host and a remote from scratch.',
 }
 
 export const metadata = {
-  title: article.title,
+  title: 'Microfrontends, Part I: The Fundamentals',
   description: article.description,
 }
 
@@ -22,14 +22,14 @@ export default (props) => <ArticleLayout article={article} {...props} />
 
 In this article we will explain the main concepts behind webpack module federation and then we will continue into implementing a series of exposable components (We will explain what that means later on), that will help us have a better frontend architecture.
 
-##### Requisites:
+### Requisites
 
 - Git, Github
 - Node, NPM
 - React, JavaScript ES6+
 - How to setup a minimal Webpack configuration
 
-##### Considerations
+### Considerations
 
 1. Webpack Module Federation: it is a plugin; <b> It is not included when you first install Webpack itself</b>.
 2. MF => <b>Module Federation</b> (not the other word haha - _sweats in GenZ_)

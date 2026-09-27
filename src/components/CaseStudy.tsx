@@ -2,7 +2,7 @@ import { ArticleLayout } from '@/components/ArticleLayout'
 import { MaybeTodo } from '@/components/Todo'
 import { type CaseStudy as CaseStudyType } from '@/lib/caseStudies'
 
-function Section({
+export function Section({
   title,
   children,
 }: {
@@ -17,16 +17,25 @@ function Section({
   )
 }
 
-export function CaseStudy({ study }: { study: CaseStudyType }) {
+export function CaseStudy({
+  study,
+  aside,
+  extra,
+}: {
+  study: CaseStudyType
+  aside?: React.ReactNode
+  /** Project-specific sections, shown after Key decisions. */
+  extra?: React.ReactNode
+}) {
   return (
-    <ArticleLayout article={{ title: study.title }}>
+    <ArticleLayout article={{ title: study.title }} aside={aside}>
       {study.draft && (
         <p>
           Draft. This page is hidden in production builds until the TODOs are
           removed.
         </p>
       )}
-      <Section title="Problem">
+      <Section title="The challenge">
         <p>
           <MaybeTodo text={study.problem} />
         </p>
@@ -41,7 +50,7 @@ export function CaseStudy({ study }: { study: CaseStudyType }) {
           <MaybeTodo text={study.constraints} />
         </p>
       </Section>
-      <Section title="Key technical decisions">
+      <Section title="Key decisions">
         <ul>
           {study.decisions.map((decision) => (
             <li key={decision}>
@@ -50,17 +59,20 @@ export function CaseStudy({ study }: { study: CaseStudyType }) {
           ))}
         </ul>
       </Section>
-      <Section title="Outcome">
+      {extra}
+      <Section title="Results">
         <p>
           <MaybeTodo text={study.outcome} />
         </p>
       </Section>
-      <Section title="Screenshots">
-        <p>
-          <MaybeTodo text={study.screenshots} />
-        </p>
-      </Section>
-      <Section title="Stack">
+      {study.screenshots && (
+        <Section title="Screenshots">
+          <p>
+            <MaybeTodo text={study.screenshots} />
+          </p>
+        </Section>
+      )}
+      <Section title="Tech stack">
         <p>
           <MaybeTodo text={study.stack} />
         </p>

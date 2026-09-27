@@ -6,6 +6,31 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  --background: #fff;
+  --foreground: #0a0a0a;
+  --muted-foreground: #737373;
+  --frame: #fff;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --muted-foreground: #a3a3a3;
+  --frame: #0a0a0a;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-frame: var(--frame);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
 @theme {
   --text-xs: 0.8125rem;
   --text-xs--line-height: 1.5rem;
@@ -33,4 +58,373 @@
   --text-8xl--line-height: 1;
   --text-9xl: 8rem;
   --text-9xl--line-height: 1;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+
+/* Arrow everywhere. Pointer only on links, buttons, and other actions. */
+body {
+  cursor: default;
+}
+
+a[href],
+area[href],
+button:not(:disabled),
+summary,
+[role='button']:not([aria-disabled='true']),
+[role='link']:not([aria-disabled='true']),
+label[for],
+select:not(:disabled),
+input:where(
+    [type='button'],
+    [type='submit'],
+    [type='reset'],
+    [type='checkbox'],
+    [type='radio'],
+    [type='file'],
+    [type='range'],
+    [type='color'],
+    [type='image']
+  ):not(:disabled),
+::file-selector-button {
+  cursor: pointer;
+}
+
+input:where(
+  :not([type]),
+  [type='text'],
+  [type='email'],
+  [type='search'],
+  [type='url'],
+  [type='password'],
+  [type='tel'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='time'],
+  [type='week']
+),
+textarea,
+[contenteditable='true'] {
+  cursor: text;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+/* Page changes: the new page fades in over the old one. */
+html.page-transition::view-transition-new(root) {
+  animation: page-fade 0.25s ease both;
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+@keyframes first-open {
+  from {
+    clip-path: circle(0px at 50vw 50vh);
+  }
+  to {
+    clip-path: circle(150vmax at 50vw 50vh);
+  }
+}
+
+.first-load-reveal {
+  animation: first-open 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .first-load-reveal {
+    animation: none;
+  }
+}
+
+.skip-to-content {
+  position: absolute;
+  left: -999px;
+  top: 1rem;
+  z-index: 100;
+  border-radius: 0.75rem;
+  background: var(--background);
+  color: var(--foreground);
+  padding: 0.5rem 1rem;
+}
+
+.skip-to-content:focus {
+  left: 1rem;
+}
+
+.site-frame {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  background: var(--frame);
+}
+
+.site-frame--top,
+.site-frame--bottom {
+  right: 0;
+  left: 0;
+  height: 10px;
+}
+
+.site-frame--top {
+  top: 0;
+}
+
+.site-frame--bottom {
+  bottom: 0;
+}
+
+.site-frame--left,
+.site-frame--right {
+  top: 0;
+  bottom: 0;
+  width: 10px;
+}
+
+.site-frame--left {
+  left: 0;
+}
+
+.site-frame--right {
+  right: 0;
+}
+
+.site-corner {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  color: var(--frame);
+}
+
+.site-corner--top-left {
+  top: 10px;
+  left: 10px;
+  transform: rotate(90deg);
+}
+
+.site-corner--top-right {
+  top: 10px;
+  right: 10px;
+  transform: rotate(180deg);
+}
+
+.site-corner--bottom-left {
+  bottom: 10px;
+  left: 10px;
+}
+
+.site-corner--bottom-right {
+  bottom: 10px;
+  right: 10px;
+  transform: rotate(270deg);
+}
+
+@media (max-width: 850px) {
+  .site-frame,
+  .site-corner {
+    display: none;
+  }
+}
+
+.nav-rail {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-width: 0;
+  opacity: 1;
+  transition:
+    grid-template-columns 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.28s ease;
+}
+
+.nav-rail-inner {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.nav-music-icon {
+  transform-origin: 50% 50%;
+}
+
+/* Touch screens: if the links don't fit a very narrow phone, they scroll sideways. */
+@media (hover: none), (pointer: coarse) {
+  .nav-rail-inner {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-rail-inner::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.nav-music {
+  position: relative;
+  z-index: 2;
+  width: 2rem;
+  min-width: 2rem;
+  flex: none;
+}
+
+.nav-theme {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-rail,
+  .nav-music,
+  .nav-music-icon {
+    transition: none;
+  }
+}
+
+.project-card,
+.article-card {
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-card:hover,
+.article-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--foreground) 22%, transparent);
+}
+
+.project-card__image-inner {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-card:hover .project-card__image-inner {
+  transform: scale(1.06);
+}
+
+@keyframes page-enter {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+
+  55% {
+    opacity: 1;
+    clip-path: inset(0 0 42% 0);
+  }
+
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.glass {
+  background: color-mix(in srgb, var(--background) 58%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+.reveal {
+  opacity: 0;
+}
+
+.reveal.is-in {
+  animation: page-fade 0.22s ease both;
+}
+
+.project-detail {
+  animation: page-enter 0.5s linear both;
+}
+
+.flex-carousel__caption {
+  color: var(--foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-in,
+  .project-detail {
+    opacity: 1;
+    clip-path: none;
+    animation: none;
+  }
+
+  .project-card,
+  .article-card,
+  .project-card__image-inner {
+    transition: none;
+  }
+
+  .project-card:hover,
+  .article-card:hover,
+  .project-card:hover .project-card__image-inner {
+    transform: none;
+  }
+}
+
+/* CuikLearn's inventory "Waddle" duck: 4 frames of 32px from its sprite sheet. */
+.duck-waddle {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  background: url('/projects/cuiklearn-duck-waddle.png') 0 0 / 128px 32px no-repeat;
+  image-rendering: pixelated;
+  animation: duck-waddle 0.7s steps(4) infinite;
+  /* The duck sits low in its frame (pixels span x 8–27, y 13–32); center it. */
+  transform: translate(-1.5px, -6.5px);
+}
+
+@keyframes duck-waddle {
+  to {
+    background-position-x: -128px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .duck-waddle {
+    animation: none;
+  }
+}
+
+/* Text links that open a new tab get a small arrow pointing up and right. */
+a[target='_blank']:not(:has(svg, img))::after {
+  content: '';
+  display: inline-block;
+  width: 0.62em;
+  height: 0.62em;
+  margin-left: 0.28em;
+  vertical-align: 0.02em;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Text selection uses the theme's main color: white in dark, black in light. */
+::selection {
+  background-color: var(--foreground);
+  color: var(--background);
 }

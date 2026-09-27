@@ -2,16 +2,19 @@ import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { CaseStudy } from '@/components/CaseStudy'
-import {
-  getCaseStudy,
-  getPublicCaseStudies,
-  isCaseStudyPublic,
-} from '@/lib/caseStudies'
+import { HustlePocketShowcase } from '@/components/HustlePocketShowcase'
+import { ProjectWall } from '@/components/ProjectWall'
+import { getCaseStudy, isCaseStudyPublic } from '@/lib/caseStudies'
+import { getProjectBySlug, projects } from '@/lib/projects'
 
 export const dynamicParams = false
 
+let personalProjects = projects.filter(
+  (project) => project.section === 'personal' && project.caseStudySlug,
+)
+
 export function generateStaticParams() {
-  return getPublicCaseStudies().map((study) => ({ slug: study.slug }))
+  return personalProjects.map((project) => ({ slug: project.caseStudySlug! }))
 }
 
 export function generateMetadata({
@@ -32,16 +35,32 @@ export function generateMetadata({
   }
 }
 
-export default function ProjectCaseStudy({
+export default function PersonalProjectPage({
   params,
 }: {
   params: { slug: string }
 }) {
-  let study = getCaseStudy(params.slug)
+  let project = getProjectBySlug(params.slug)
+  if (!project || project.section !== 'personal') {
+    notFound()
+  }
 
+  let study = getCaseStudy(params.slug)
   if (!study || !isCaseStudyPublic(study)) {
     notFound()
   }
 
-  return <CaseStudy study={study} />
+  return (
+    <CaseStudy
+      study={study}
+      extra={params.slug === 'hustlepocket' ? <HustlePocketShowcase /> : null}
+      aside={
+        <ProjectWall
+          slug={params.slug}
+          name={project.name}
+          cover={project.image}
+        />
+      }
+    />
+  )
 }

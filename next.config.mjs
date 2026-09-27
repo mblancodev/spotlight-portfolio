@@ -8,6 +8,8 @@ const nextConfig = {
   experimental: {
     outputFileTracingIncludes: {
       '/articles/*': ['./src/app/articles/**/*.mdx'],
+      '/cv.pdf': ['./src/content/cv.pdf'],
+      '/api/cv': ['./src/content/cv.pdf'],
     },
   },
 }

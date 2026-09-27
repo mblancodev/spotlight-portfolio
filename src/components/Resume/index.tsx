@@ -1,5 +1,6 @@
 'use client'
 
+import GlassSurface from '@/components/GlassSurface'
 import { RoleType } from '@/types'
 import { ArrowDownIcon } from '../Icons/ArrowDownIcon'
 import { Button } from '../Button'
@@ -15,14 +16,16 @@ export function Resume() {
   let resume: Array<RoleType> = [
     {
       company: 'Astrolle Inc',
-      title: 'Co-Founder & Frontend Tech Lead',
+      title: 'Co-founder & Lead Engineer',
       initials: 'A',
       start: 'Sep 2025',
       end: {
         label: 'Present',
         dateTime: new Date().getFullYear().toString(),
       },
-      highlights: [impactTodo],
+      highlights: [
+        'Lead the TypeScript and React micro-frontend platform, including the shared component library, the workflow editor, and live notifications over NATS. Design data structures, manage configuration, and run CI/CD with GitHub Actions, Docker, and Azure. Built custom agent workflows that have turned more than 250 spoken requirements into tested, Playwright-verified pull requests, each approved by an engineer. Hired three engineers and handle most code reviews.',
+      ],
       note: 'TODO(manuel): add logo file',
     },
     {
@@ -31,7 +34,9 @@ export function Resume() {
       initials: 'N',
       start: 'May 2025',
       end: 'Sep 2025',
-      highlights: [impactTodo],
+      highlights: [
+        'Improved usability and UX in production features. Within my first two weeks, proposed code-maintenance rules for the team.',
+      ],
       note: 'TODO(manuel): add logo file',
     },
     {
@@ -41,7 +46,9 @@ export function Resume() {
       img: true,
       start: '2022',
       end: '2024',
-      highlights: [impactTodo],
+      highlights: [
+        'Started on the frontend team, then took on backend work in Python and Node.js. TODO(manuel): what the backend task was and one result.',
+      ],
     },
     {
       company: 'Infrapedia Inc',
@@ -51,8 +58,8 @@ export function Resume() {
       start: '2019',
       end: '2022',
       highlights: [
-        'Software engineer on a network and data-center infrastructure tool.',
-        impactTodo,
+        'Owned the Vue.js and Mapbox GL frontend for a global map of cables, fiber, datacenters, and internet exchange points.',
+        'Built on-map editors so the dataset could grow without a developer, and kept the map usable on phones and mid-range laptops.',
       ],
     },
     {
@@ -83,31 +90,33 @@ export function Resume() {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
-      <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-        <BriefcaseIcon className="h-6 w-6 flex-none" />
-        <span className="pointer-events-none ml-3">Work</span>
-      </h2>
-      <ol className="mt-6 space-y-4">
-        {resume.map((role, roleIndex) => (
-          <Role key={roleIndex} role={role} />
-        ))}
-      </ol>
-      <Button
-        variant="secondary"
-        onClick={() => downloadCV()}
-        className="group mt-6 w-full cursor-pointer"
-      >
-        Download CV
-        <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
-      </Button>
-      <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
-        <Todo>
-          TODO(manuel): update CV — public/cv.pdf is titled CV-2024 and predates
-          the Astrolle and Neostella roles
-        </Todo>
-      </p>
-    </div>
+    <GlassSurface borderRadius={24}>
+      <div className="p-6">
+        <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <BriefcaseIcon className="h-6 w-6 flex-none" />
+          <span className="pointer-events-none ml-3">Work</span>
+        </h2>
+        <ol className="mt-6 space-y-4">
+          {resume.map((role, roleIndex) => (
+            <Role key={roleIndex} role={role} />
+          ))}
+        </ol>
+        <Button
+          variant="secondary"
+          onClick={() => downloadCV()}
+          className="group mt-6 w-full cursor-pointer"
+        >
+          Download CV
+          <ArrowDownIcon className="h-4 w-4 stroke-zinc-400 transition group-active:stroke-zinc-600 dark:group-hover:stroke-zinc-50 dark:group-active:stroke-zinc-50" />
+        </Button>
+        <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+          <Todo>
+            TODO(manuel): update CV — public/cv.pdf is titled CV-2024 and
+            predates the Astrolle and Neostella roles
+          </Todo>
+        </p>
+      </div>
+    </GlassSurface>
   )
 }
 
