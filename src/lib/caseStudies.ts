@@ -6,7 +6,8 @@ export type CaseStudy = {
   draft: boolean
   problem: string
   role: string
-  constraints: string
+  /** A paragraph, or a list of separate points. */
+  constraints: string | string[]
   decisions: string[]
   outcome: string
   screenshots?: string
@@ -35,7 +36,7 @@ export const caseStudies: CaseStudy[] = [
       'Requirements go through custom agent workflows built with Claude Code, Codex, Cursor, and Grok. A spoken requirement is transcribed, then structured by a custom skill into a plan for new or ongoing work. The agent implements it with tests and checks it end to end with Playwright. It opens a pull request only after an engineer approves the changes.',
     ],
     outcome:
-      'Astrolle has shipped 15 product modules and is live with companies in retail, agribusiness, construction, and services. TODO(manuel): active users. The modular architecture lets teams ship in parallel and add product lines without reworking existing modules, and the agent workflows have handled more than 250 requirements so far.',
+      'Astrolle has shipped 15 product modules and is live with companies in retail, agribusiness, construction, and services. The modular architecture lets teams ship in parallel and add product lines without reworking existing modules, and the agent workflows have handled more than 250 requirements so far.',
     stack:
       'TypeScript, React, micro-frontends with React Router, Zustand, Redux Toolkit, Tailwind CSS, MongoDB, and NATS over WebSockets (nats.ws). An in-house component and utilities library is shared across the applications. CI/CD runs on GitHub Actions, with Docker images deployed to Azure. Agent workflows use Claude Code, Codex, Cursor, and Grok, with Playwright for end-to-end tests.',
   },
@@ -46,19 +47,22 @@ export const caseStudies: CaseStudy[] = [
       'Building a Mapbox GL map of submarine cables, fiber, datacenters, and exchange points, with on-map editors and performance that holds up on everyday devices.',
     draft: false,
     problem:
-      'Network engineers, NOC teams, and telecom business development professionals needed one map of the internet’s physical infrastructure: submarine cables, terrestrial fiber, datacenters, and internet exchange points.',
-    role: 'Frontend developer at Infrapedia Inc, 2019–2022, with full ownership of the client application. With no design team, I made the UI, UX, layout, and visual decisions, and I owned the architecture and implementation. I coordinated API contracts and data structures with the backend developer and reported to a Germany-based product owner. Meetings, planning, and communication were in English.',
-    constraints:
-      'There was no design team. The map had to render large, dense geospatial datasets smoothly on phones and mid-range laptops, not only on high-end machines. API contracts were shared with a backend developer, and the team worked across time zones.',
+      'Network engineers, network operations teams, and telecom business development professionals needed a single map of the internet’s physical backbone: undersea cables, land-based fiber, datacenters, and internet exchange points.',
+    role: 'Frontend developer at Infrapedia Inc. (2019–2022), with full ownership of the user-facing application. With no design team, I handled the interface, user experience, and visual design, as well as the architecture and development. I worked with the backend developer to agree on how data moved between systems, and reported to a product owner in Germany. All meetings, planning, and communication were in English.',
+    constraints: [
+      'No designer. Every interface and visual decision was mine to make.',
+      'Heavy data, everyday devices. The map had to stay smooth with thousands of detailed data points on phones and mid-range laptops, not just high-end machines.',
+      'Distributed team. I shared technical agreements with a backend developer and collaborated across time zones.',
+    ],
     decisions: [
-      'Built the Mapbox GL map from scratch, with layered data for submarine cables, terrestrial fiber, datacenters, and internet exchange points, plus search and detail views for each asset.',
-      'Built custom editors so people can draw, edit, and manage cable routes, networks, and facilities on the map, with create, read, update, and delete for each asset type.',
-      'Optimized rendering and data handling so dense datasets stay usable on mobile devices and mid-range laptops.',
-      'Designed the interface for a professional audience working with a dense technical dataset, without a separate design team.',
+      'Built the interactive map from scratch, with separate layers for undersea cables, land fiber, datacenters, and exchange points, plus search and a detail view for every asset.',
+      'Built in-map editing tools so users can draw, update, and manage cable routes, networks, and facilities themselves, without needing a developer.',
+      'Tuned performance so dense data stays fast and usable on the devices people actually carry.',
+      'Designed for professionals, keeping a complex technical dataset clear and easy to navigate.',
     ],
     outcome:
-      'Shipped a production mapping application used by the global network operator community. The editors let the dataset grow without a developer, and the performance work made the map usable on the devices that audience actually uses. I owned the frontend end to end in a distributed, English-speaking team.',
-    stack: 'Vue.js, Redux, Sass, Mapbox GL, and MongoDB.',
+      'Shipped a production mapping platform used by network operators around the world. The editing tools let the dataset grow without developer involvement, and the performance work made the map practical on everyday hardware. I owned the frontend end to end within a distributed, English-speaking team.',
+    stack: 'Built with Vue.js, Vuex, Sass, Mapbox GL, and MongoDB.',
   },
   {
     slug: 'amauz-group',
@@ -90,21 +94,22 @@ export const caseStudies: CaseStudy[] = [
       'A bilingual matchmaking platform with authentication, a waitlist, and city pages, built end to end on Next.js and Supabase.',
     draft: false,
     problem:
-      'Curated Lovers is a matchmaking service positioned as an alternative to dating apps: no swiping, no algorithm. Members are vetted and matched by human curators, then invited to blind dates or small curated events.',
-    role: 'Sole developer and product owner. I defined the product concept, brand, and user experience, and designed and built the platform end to end, from UI and content to backend, authentication, email, and deployment.',
-    constraints:
-      'The website is the public face and entry point, and it is in waitlist mode ahead of launch. The operational side of the service is still in progress. The site has to work in English and Spanish.',
+      'Curated Lovers is a matchmaking service for people tired of dating apps: no swiping, no algorithm. Human curators vet members and match them personally, then invite them to blind dates or small curated events.',
+    role: 'Founder, product owner, and sole developer. I defined the concept, brand, and user experience, and designed and built the entire platform, from interface and copy to accounts, email, and launch.',
+    constraints: [
+      'Pre-launch. The website is the brand’s public face and first point of contact, running in waitlist mode while the matchmaking operation is being set up.',
+      'Two languages. Every page had to work fully in English and Spanish.',
+    ],
     decisions: [
-      'Registration, login, and the waitlist run on Supabase authentication and the database.',
-      'Resend sends waitlist and account email, plus a newsletter subscription.',
-      'Four launch cities — Medellín, Bogotá, Cali, and Caracas — each have a page, and the events list can be filtered by city.',
-      'Service pages cover blind dates and curated events, alongside an FAQ, founder story, contact page, and terms and privacy policy.',
-      'Locale-based routing covers the whole site in English and Spanish, with SEO metadata and dynamically generated Open Graph images.',
+      'Waitlist first. Visitors can sign up, create an account, and join the waitlist now, so demand is measurable before launch.',
+      'Automatic email. Sign-ups, account emails, and a newsletter keep future members engaged until launch.',
+      'Built around cities. Medellín, Bogotá, Cali, and Caracas each have their own page, and events can be filtered by city, so the service feels local from day one.',
+      'Trust built into the content. Pages for blind dates and events sit alongside an FAQ, the founder’s story, contact details, and clear terms and privacy policies. For a service asking people to meet strangers, credibility matters as much as features.',
+      'Fully bilingual and easy to find. The whole site is available in both languages, optimized for search, and shows polished previews when shared on social media or messaging apps.',
     ],
     outcome:
-      'The website is finished and live, collecting waitlist sign-ups for launch. It is a positioned brand and a production-ready bilingual platform with authentication, a database, and email. The operational side of the service is still in progress.',
-    stack:
-      'Next.js (React), Supabase for the database and authentication, and Resend for transactional and marketing email, deployed on Vercel. Bilingual English and Spanish with locale-based routing, SEO metadata, and dynamically generated Open Graph images.',
+      'The site is live and collecting waitlist sign-ups. Curated Lovers launches with a defined brand and a production-ready bilingual platform with accounts, a database, and email in place.',
+    stack: 'Built with Next.js (React), Supabase, Resend, and Vercel.',
   },
   {
     slug: 'cuiklearn',
@@ -113,39 +118,49 @@ export const caseStudies: CaseStudy[] = [
       'A gamified learning app with a FastAPI backend that generates structured courses from uploaded material using the Claude API.',
     draft: false,
     problem:
-      'CuikLearn is a Duolingo-style learning platform. People move through paths of short games and earn stars, coins, and streaks. It ships with paths for JavaScript fundamentals and Italian, plus skill-graph roadmaps for frontend development, computer science, data science, and algorithms. People can also upload their own material and get a playable path back.',
-    role: 'Sole developer. I designed and built the project end to end as a hands-on way to learn and experiment, covering product design, UI and UX, frontend architecture, a Python backend, AI integration, and deployment.',
-    constraints:
-      'Handcrafted lessons and AI-generated lessons have to play through the same game shell. The app runs on the Vercel and Supabase free tiers, and it is no longer actively maintained.',
+      'Learning a technical skill or a new language on your own is easy to start and hard to stick with. CuikLearn borrows what makes language apps addictive: short game-based lessons, stars, coins, and daily streaks. It ships with paths for JavaScript fundamentals and Italian, plus visual roadmaps for frontend development, computer science, data science, and algorithms. Users can also upload their own study material and get a playable course back.',
+    role: 'Sole developer. I built CuikLearn end to end as a hands-on way to learn and experiment, covering product design, interface and user experience, frontend architecture, a Python backend, AI integration, and deployment.',
+    constraints: [
+      'One experience for all content. Lessons I wrote by hand and lessons generated by AI had to look and play exactly the same.',
+      'Zero budget. Everything runs on free hosting and database plans.',
+    ],
     decisions: [
-      'A FastAPI service sends uploaded text, PDFs, Word documents, or images to Claude with a structured schema prompt, then returns skill nodes, dependencies, and games. People preview and confirm before anything is saved.',
-      'A shared game shell manages lives, progress, scoring, and feedback. True/false, multiple choice, and flashcards are templates, so handcrafted and AI-generated content render the same way.',
-      'Progress includes star ratings, streaks with streak shields, weekly and all-time scores, an in-app currency, and a shop of power-ups.',
-      'An animated duck mascot is driven by a spritesheet, with a data-driven way to chain animation sequences and an in-app tool for building and previewing them.',
-      'The UI uses an atomic component structure, routes for new learning paths are generated, and adding a game follows a documented workflow. The app is internationalized, has guided tours, and keeps progress across sessions.',
+      'Turn any material into a course. Users upload notes, PDFs, Word documents, or images, and AI breaks them into topics, figures out which ones build on others, and creates games for each. Users review the result before anything is saved, so they stay in control.',
+      'One game engine, many formats. A shared foundation handles lives, progress, scoring, and feedback. True/false, multiple choice, and flashcards plug into it, which keeps every lesson consistent and makes new game types quick to add.',
+      'Motivation built in. Star ratings, streaks with streak protection, weekly and all-time leaderboards, an in-app currency, and a shop of power-ups give people reasons to come back.',
+      'A mascot with personality. An animated duck reacts to the user’s progress. I also built an in-app tool to design and preview its animation sequences without touching code.',
+      'Built to grow. Reusable interface components, automatically generated pages for new learning paths, and a documented process for adding games make the app easy to extend. It supports multiple languages, includes guided tours for new users, and saves progress between sessions.',
     ],
     outcome:
-      'The project was a learning ground for full-stack work: React architecture (atomic design, state management, internationalization), game and animation systems, a Python FastAPI service, and structured output from the Claude API inside a real product flow. It is live on the Vercel and Supabase free tiers and is no longer actively maintained.',
+      'CuikLearn is live and served as a full-stack training ground: scalable React architecture, game and animation systems, a Python backend, and AI that produces reliable, structured content inside a real product. It is no longer actively maintained.',
     stack:
-      'Frontend: React 18 with TypeScript and Vite, Tailwind CSS, Zustand with persisted client state, TanStack Query, React Router, dnd-kit, Framer Motion, i18next, and React Joyride. Backend: Python with FastAPI and the Anthropic Claude API. Infrastructure: Supabase, deployed on Vercel with Vercel Analytics.',
+      'Built with React, TypeScript, Tailwind CSS, Zustand, TanStack Query, Framer Motion, i18next, Python (FastAPI), the Claude API, Supabase, and Vercel.',
   },
   {
     slug: 'hustlepocket',
     title: 'HustlePocket',
     description:
       'A job tracker with a Node.js API, PDF pipeline, Chrome extension, and MCP server so a personal agent can manage the search.',
-    draft: true,
+    draft: false,
     problem:
-      'A job search splits across the posting, a CV file, and notes. People who already use an agent can keep that in a folder, but then the uploaded PDF, the capture step, and the board are separate. HustlePocket is for one person who wants those in one system their agent can write into.',
-    role: 'Sole developer. I designed and built the product, the API, the PDF pipeline, the MCP server, and the Chrome extension.',
-    constraints: 'TODO(manuel): technical or product constraints.',
+      'A job search is scattered: the posting lives on one site, the CV in a file, the notes somewhere else. People who already use an AI assistant can keep it all in a folder, but the CV, saving job postings, and tracking applications still don’t connect. HustlePocket brings them into one place that the person’s own AI assistant can work in directly.',
+    role: 'Sole developer, end to end. I designed the product and built the backend, the CV processing, the AI assistant integration, and the Chrome extension.',
+    constraints: [
+      'Security: private credentials could never be exposed in the browser, and most job sites block extensions from sending data out.',
+      'Honesty: a tailored CV could never invent experience the person doesn’t have.',
+      'Independence: it had to work with the AI assistant the buyer already uses. The core features need no AI subscription, and the paid version runs entirely on the buyer’s own computer, with no cloud account.',
+    ],
     decisions: [
-      'TODO(manuel): key technical decisions, and why you made them.',
+      'Every action is verified. Users sign in once, and the server checks each request, so people can only see and change their own data.',
+      'One way in. Whether a job is saved from the browser extension, the built-in assistant, or an outside AI tool, it goes through the same entry point. That means fewer failure points and consistent data.',
+      'A safely contained assistant. The built-in assistant runs on the AI tool the person already has installed, in an isolated workspace. It can search the web and update the board, but it can’t run commands or modify files.',
+      'The original CV stays the source. The uploaded PDF is never replaced. Tailored versions are generated from it as clean new PDFs, and downloads stay private to the account.',
+      'Try before signing up. Guest mode keeps everything on the device, so people can explore the board first. Uploads, tailoring, and the assistant require an account.',
     ],
     outcome:
-      'It runs locally. The Companion extension saves a posting onto the board, and an agent connected over MCP can import listings from the stored CV. Text edits patch the uploaded PDF rather than generating a new generic resume. It is not public yet.',
+      'HustlePocket runs locally and isn’t public yet. The Companion extension saves postings straight to the board, and an outside AI assistant can find and import listings based on the stored CV. When you edit your CV, the changes are written into a copy of your original PDF, keeping its layout, instead of producing a generic template. Tailored versions for each job are generated as separate new PDFs.',
     stack:
-      'React, TypeScript, Vite, and Tailwind CSS. Node.js with Express. Appwrite for the database, file storage, and authentication. PDF parsing and generation, an MCP server, and a Chrome extension.',
+      'Built with React, TypeScript, Vite, and Tailwind CSS on the front end, Express and Appwrite on the back end, React PDF for CV generation, MCP for agent access, and a Chrome extension for capture.',
   },
 ]
 

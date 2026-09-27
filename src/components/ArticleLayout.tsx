@@ -74,9 +74,10 @@ export function ArticleLayout({
               </Prose>
             </GlassSurface>
             {aside && (
-              // Right of the 42rem column to the viewport edge (less scrollbar), from
-              // the title down to the end of the panel. Sticks below the nav on scroll.
-              <div className="absolute top-6 bottom-0 left-full hidden w-[calc(80vw-42rem-1.25rem)] xl:block">
+              // Right of the 42rem column, 3rem gap each side, from the title down to the
+              // end of the panel. Sticks below the nav on scroll. Widths mirror Container:
+              // centered 68.75rem with 2.5rem padding, or a 20vw offset from 4xl up.
+              <div className="absolute top-6 bottom-0 left-[calc(100%+3rem)] hidden w-[calc(50vw-16.125rem)] xl:block 4xl:w-[calc(80vw-48rem)]">
                 <div className="sticky top-28 h-[calc(100vh-7rem)]">
                   {aside}
                 </div>

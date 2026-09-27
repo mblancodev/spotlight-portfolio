@@ -16,14 +16,14 @@ export function Footer() {
     <footer className="relative mt-24 flex-none sm:mt-32">
       {/* Black in both themes; fades out where the link row's text starts (pb-20 + one line). */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[16.5rem] bg-linear-to-t from-neutral-500/25 to-transparent dark:from-black/60"
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-66 bg-linear-to-t from-neutral-500/25 to-transparent dark:from-black/60"
         aria-hidden="true"
       />
       <div
         className="h-px w-full bg-linear-to-r from-transparent via-foreground/30 to-transparent"
         aria-hidden="true"
       />
-      <div className="mx-auto w-full max-w-[68.75rem] px-6 sm:px-10 lg:ml-[20vw] lg:pl-0">
+      <div className="mx-auto w-full max-w-275 px-6 sm:px-10 4xl:ml-[20vw] 4xl:pl-0">
         <div className="flex flex-col items-start gap-5 py-16 sm:py-20">
           <h2 className="font-serif text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
             Let’s build something

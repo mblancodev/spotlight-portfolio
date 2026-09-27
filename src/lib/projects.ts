@@ -64,8 +64,7 @@ export const projects: Project[] = [
     name: 'Neostella',
     logo: 'N',
     logoImage: '/projects/neostella-logo.png',
-    summary:
-      'TODO(manuel): one or two sentences on the product and what you owned.',
+    summary: '[Draft]',
     role: 'Front End Engineer II',
     stack: 'TODO(manuel): key technologies.',
     outcome: 'TODO(manuel): one concrete result.',
@@ -81,7 +80,7 @@ export const projects: Project[] = [
     summary:
       'The interactive map network engineers use to explore the internet’s physical infrastructure. I owned the frontend end to end.',
     role: 'Frontend developer',
-    stack: 'Vue.js, Redux, Sass, Mapbox GL, and MongoDB.',
+    stack: 'Vue.js, Vuex, Sass, Mapbox GL, and MongoDB.',
     outcome:
       'A production map the operator community uses. Editors grow the dataset without a developer, and the map stays usable on phones and mid-range laptops.',
     link: { href: 'https://www.infrapedia.com/', label: 'infrapedia.com' },
@@ -106,7 +105,7 @@ export const projects: Project[] = [
     link: { href: 'https://www.amauzgroup.com/', label: 'amauzgroup.com' },
     caseStudySlug: 'amauz-group',
     section: 'professional',
-    dates: 'TODO(manuel): date range',
+    dates: 'Jan 2022',
     image: '/projects/amauz-group-hero.jpg',
   },
   {

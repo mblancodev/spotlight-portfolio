@@ -5,7 +5,7 @@ import { RoleType } from '@/types'
 import { ArrowDownIcon } from '../Icons/ArrowDownIcon'
 import { Button } from '../Button'
 import { BriefcaseIcon } from '../Icons/BriefcaseIcon'
-import { Todo } from '@/components/Todo'
+import { MaybeTodo, Todo } from '@/components/Todo'
 import { impactTodo } from '@/lib/site'
 import Infrapedia from '@/images/logos/infrapedia.svg'
 import Edgeuno from '@/images/logos/edgeuno.svg'
@@ -167,11 +167,7 @@ function Role({ role }: { role: RoleType }) {
           <dd className="mt-2 w-full space-y-2 text-xs break-words text-zinc-600 dark:text-zinc-400">
             {role.highlights.map((highlight) => (
               <p key={highlight}>
-                {highlight.includes('TODO(manuel)') ? (
-                  <Todo>{highlight}</Todo>
-                ) : (
-                  highlight
-                )}
+                <MaybeTodo text={highlight} />
               </p>
             ))}
           </dd>

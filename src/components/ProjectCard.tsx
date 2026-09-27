@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import GlassSurface from '@/components/GlassSurface'
 
-import { MaybeTodo } from '@/components/Todo'
+import { MaybeTodo, hasContent } from '@/components/Todo'
 import { getCaseStudy, isCaseStudyPublic } from '@/lib/caseStudies'
 import { projectHref, type Project } from '@/lib/projects'
 
@@ -33,7 +33,7 @@ export function ProjectCard({ project }: { project: Project }) {
   let meta = [
     role,
     project.section === 'personal' ? project.status : project.dates,
-  ].filter((part): part is string => Boolean(part))
+  ].filter(hasContent)
 
   return (
     <GlassSurface height="100%" borderRadius={24} className="h-full">
@@ -66,11 +66,15 @@ export function ProjectCard({ project }: { project: Project }) {
             )}
           </div>
         </div>
-        <p className="px-1 text-[14px] leading-normal tracking-tight break-words text-foreground/65 sm:text-[15px]">
-          <MaybeTodo text={project.summary} />{' '}
-          {project.summaryTodo && <MaybeTodo text={project.summaryTodo} />}
-          {project.personality}
-        </p>
+        {(hasContent(project.summary) ||
+          hasContent(project.summaryTodo) ||
+          project.personality) && (
+          <p className="px-1 text-[14px] leading-normal tracking-tight break-words text-foreground/65 sm:text-[15px]">
+            <MaybeTodo text={project.summary} />{' '}
+            {project.summaryTodo && <MaybeTodo text={project.summaryTodo} />}
+            {project.personality}
+          </p>
+        )}
         <div className="mt-auto">
           {meta.length > 0 && (
             <p className="px-1 pb-1 text-[12px] tracking-tight break-words text-foreground/50">
@@ -102,17 +106,17 @@ export function ProjectCard({ project }: { project: Project }) {
                 </a>
               </li>
             )}
-            {project.repo && (
+            {hasContent(project.repo) && (
               <li>
                 <ExternalOrTodo label="GitHub" value={project.repo} />
               </li>
             )}
-            {project.npm && (
+            {hasContent(project.npm) && (
               <li>
                 <ExternalOrTodo label="npm" value={project.npm} />
               </li>
             )}
-            {project.demo && (
+            {hasContent(project.demo) && (
               <li>
                 <ExternalOrTodo label="Demo" value={project.demo} />
               </li>

@@ -18,34 +18,35 @@ export function HustlePocketShowcase() {
     <>
       <Section title="The Companion extension">
         <p>
-          Found a job by hand? HustlePocket Companion is a Chrome extension that
-          saves the posting to your board in one click, with no copying into a
-          spreadsheet.
+          Found a job on your own? HustlePocket Companion is a Chrome extension
+          that saves the posting to your board in one click. No copying and
+          pasting into a spreadsheet.
         </p>
         <ul>
           <li>
-            The toolbar popup reads the posting on the current tab. LinkedIn,
-            Indeed, and Lever get field-by-field extraction. Any other site gets
-            an editable form and a “Request site support” button that tells me
-            which site to support next.
+            Reads the page for you. On LinkedIn, Indeed, and Lever, it pulls out
+            the job details automatically. On any other site, it opens a quick
+            form to fill in, plus a “Request site support” button that tells me
+            which sites to add next.
           </li>
           <li>
-            On LinkedIn, Indeed, Lever, Glassdoor, and Greenhouse, a floating
-            button expands into a side panel right on the page.
+            Works right on the page. On LinkedIn, Indeed, Lever, Glassdoor, and
+            Greenhouse, a floating button opens a side panel without leaving the
+            listing.
           </li>
           <li>
-            Job sites’ content security policies block requests from injected
-            scripts, so the panel hands each save to a background service worker
-            that calls the API.
+            Gets past site restrictions. Job sites block extensions from sending
+            data directly, so saves are passed to a background process that
+            delivers them safely.
           </li>
           <li>
-            Saves go through the same import service as the rest of the board,
-            so a posting lands the same way whether you saved it or the agent
-            found it.
+            Consistent results. Every save goes through the same path as the
+            rest of the board, so a job looks the same whether you saved it or
+            the assistant found it.
           </li>
         </ul>
       </Section>
-      <Section title="Meet your companion">
+      <Section title="The assistant">
         <div className="not-prose my-6 flex justify-center">
           <HustleAgent
             markup={agentMarkup}
@@ -53,10 +54,10 @@ export function HustlePocketShowcase() {
           />
         </div>
         <p>
-          The agent lives in a floating button on the board. Chat with it to
-          search for jobs that match your CV, or paste links. It works in the
-          background and lets you know once the new jobs are on your
-          Applications board.
+          The assistant sits in a floating button on the board. Ask it to find
+          jobs that match your CV, or paste links you’ve found. It works in the
+          background and lets you know when new jobs are on your Applications
+          board.
         </p>
       </Section>
     </>
