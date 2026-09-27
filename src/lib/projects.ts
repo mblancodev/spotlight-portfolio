@@ -164,4 +164,18 @@ export const projects: Project[] = [
     status: 'Coming soon',
     image: '/projects/hustlepocket-board.jpg',
   },
+  {
+    name: 'MichelleOS',
+    logo: 'M',
+    summary:
+      'A personal voice assistant that runs on your Mac. It keeps one memory of your world, answers from evidence, and asks for Touch ID before it changes anything that matters.',
+    role: 'Sole developer and product owner',
+    stack:
+      'Python and Swift on macOS, local Whisper speech-to-text and Kokoro text-to-speech, SQLite, WebAuthn passkeys, MCP, and launchd, with Claude and Codex behind a provider-agnostic model router.',
+    outcome:
+      'In private alpha on my own machine, with a signed installer and release channel. It speaks four languages, delivers daily briefings, and runs background skills that report what they did.',
+    caseStudySlug: 'michelleos',
+    section: 'personal',
+    status: 'Private alpha',
+  },
 ]

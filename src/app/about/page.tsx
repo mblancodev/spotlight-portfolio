@@ -1,10 +1,8 @@
 import { type Metadata } from 'next'
-import Image from 'next/image'
 
 import { Container } from '@/components/Container'
 import GlassSurface from '@/components/GlassSurface'
 import { SelfPresentation } from '@/components/SelfPresentation'
-import portraitImage from '@/images/portrait.png'
 import { aboutDescription } from '@/lib/site'
 
 export const metadata: Metadata = {
@@ -22,12 +20,13 @@ export default function About() {
         <div className="lg:max-w-md lg:justify-self-end">
           <div className="rounded-[2rem] border border-foreground/8 bg-background p-1.5 shadow-sm">
             <div className="overflow-hidden rounded-[1.6rem]">
-              <Image
-                src={portraitImage}
-                alt=""
-                sizes="(min-width: 1024px) 28rem, 100vw"
-                className="aspect-square w-full object-cover grayscale"
-              />
+              <div
+                role="img"
+                aria-label="Portrait placeholder"
+                className="flex aspect-square w-full items-center justify-center bg-foreground/5 font-serif text-5xl text-foreground/25"
+              >
+                MB
+              </div>
             </div>
           </div>
           <GlassSurface className="mt-6" borderRadius={16}>

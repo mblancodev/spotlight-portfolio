@@ -6,9 +6,7 @@ import { type ArticleWithSlug, getHomeArticles } from '@/lib/articles'
 import { formatDate } from '@/lib/formatDate'
 import { projects } from '@/lib/projects'
 import { contactEmail } from '@/lib/site'
-import portraitImage from '@/images/portrait.png'
 import { Button } from '@/components/Button'
-import Image from 'next/image'
 
 const featuredNames = [
   'Astrolle',
@@ -99,13 +97,13 @@ export default async function Home() {
             <div className="w-full shrink-0 md:w-[22rem] lg:w-[24rem]">
               <div className="rounded-[2rem] border border-foreground/8 bg-background p-1.5 shadow-sm">
                 <div className="overflow-hidden rounded-[1.6rem]">
-                  <Image
-                    src={portraitImage}
-                    alt="Manuel Blanco"
-                    priority
-                    sizes="(min-width: 768px) 26rem, 100vw"
-                    className="aspect-square w-full object-cover grayscale"
-                  />
+                  <div
+                    role="img"
+                    aria-label="Portrait placeholder"
+                    className="flex aspect-square w-full items-center justify-center bg-foreground/5 font-serif text-5xl text-foreground/25"
+                  >
+                    MB
+                  </div>
                 </div>
               </div>
             </div>

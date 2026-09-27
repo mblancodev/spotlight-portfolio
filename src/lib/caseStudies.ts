@@ -162,6 +162,33 @@ export const caseStudies: CaseStudy[] = [
     stack:
       'Built with React, TypeScript, Vite, and Tailwind CSS on the front end, Express and Appwrite on the back end, React PDF for CV generation, MCP for agent access, and a Chrome extension for capture.',
   },
+  {
+    slug: 'michelleos',
+    title: 'MichelleOS',
+    description:
+      'A local-first voice assistant for macOS, with a persistent memory of your world, grounded answers, and passkey-gated actions.',
+    draft: true,
+    problem:
+      'Most assistants are chat windows with amnesia. Each conversation starts from zero, answers sound confident whether or not anything backs them up, and the more useful an assistant becomes, the more it is trusted to act on your behalf with nothing stronger than a “yes.” I wanted an assistant that behaves like a trusted chief of staff: one that remembers what matters, shows its sources, and never touches anything important without proof that it is really me asking.',
+    role: 'Sole developer, end to end. I designed the product and its architectural rules, and built the voice pipeline, the memory system, the security model, the macOS app, and the release tooling.',
+    constraints: [
+      'Privacy: notes, memory, and voice stay on the Mac. Speech recognition and speech synthesis run locally.',
+      'Trust: a model can suggest an action, but it can never be the thing that authorizes it.',
+      'Longevity: AI providers change every few months. Michelle’s memory and permissions had to survive swapping the model underneath.',
+      'Honesty: when there is no evidence for an answer, Michelle has to say so instead of guessing.',
+    ],
+    decisions: [
+      'One source of truth. Voice, the desktop HUD, the command line, and background jobs all read and write the same model of the user’s world. There is only ever one Michelle, not a separate one per screen.',
+      'Touch ID for anything real. Notes can change freely, but any change to actual code needs a WebAuthn passkey confirmation. A spoken “yes” is never enough, and outside tools are blocked at the tool level, not just discouraged in a prompt.',
+      'Answers come with receipts. Michelle retrieves evidence first, answers only from it, cites where each fact came from, and stays quiet when nothing supports the question. Facts, inferences, and preferences are stored separately so assumptions never pass as truth.',
+      'Models are replaceable. Every AI call goes through a single router that picks a provider for the job. Claude and Codex are interchangeable, and when they write code they work in an isolated copy that Michelle checks before anything is promoted.',
+      'Built to ship, not just to demo. Reproducible, hash-locked environments, a one-command installer, signed releases, and transactional upgrades with rollback, so a bad release can be undone in one step.',
+    ],
+    outcome:
+      'MichelleOS runs daily in private alpha. It understands and answers in English, Spanish, Portuguese, and French, delivers morning and evening briefings grounded in real notes, and runs background skills for the inbox, calendar, habits, and reading, each leaving a record of what it did and why. New capabilities can be taught by voice, and every consequential action is traceable to what authorized it.',
+    stack:
+      'Built with Python on a Swift macOS app, local Whisper for speech recognition and mlx-audio and Kokoro for speech, SQLite for state, WebAuthn passkeys for authorization, MCP for Gmail, Calendar, and file tools, launchd for background services, and Claude and Codex behind a provider-agnostic model router. The HUD is plain HTML, CSS, and JavaScript over an Obsidian-compatible vault.',
+  },
 ]
 
 export function getCaseStudy(slug: string) {
