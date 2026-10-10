@@ -5,7 +5,13 @@ import { projects } from '@/lib/projects'
 
 const order = {
   professional: ['Astrolle', 'Neostella', 'Infrapedia', 'Amauz Group'],
-  personal: ['MichelleOS', 'HustlePocket', 'Curated Lovers', 'CuikLearn'],
+  personal: [
+    'Gwen',
+    'MichelleOS',
+    'HustlePocket',
+    'Curated Lovers',
+    'CuikLearn',
+  ],
 }
 
 export function ProjectShowcase({

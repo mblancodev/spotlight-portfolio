@@ -149,6 +149,28 @@ export const projects: Project[] = [
     image: '/projects/curated-lovers-hero.jpg',
   },
   {
+    name: 'Gwen',
+    logo: '🎙️',
+    logoImage: '/projects/gwen-logo.png',
+    summary:
+      'Dictation and translation in any Mac app. Hold a key, speak, and the text is pasted at the cursor. Speech and translation stay on the Mac.',
+    role: 'Sole developer',
+    stack:
+      'Swift and AppKit for the menu bar app and bottom bar, Python for the listener, a local whisper.cpp server for speech-to-text, and Apple’s on-device Translation framework.',
+    outcome:
+      'Open source under the MIT license. Dictation with rule-based punctuation in English and Spanish, translation across six languages, and a gwen:// URL scheme other apps can call.',
+    link: {
+      href: '/articles/gwen-local-dictation-and-translation-for-macos',
+      label: 'Launch post',
+    },
+    repo: 'https://github.com/mblancodev/gwen',
+    demo: 'https://gwen-chi.vercel.app',
+    caseStudySlug: 'gwen',
+    section: 'personal',
+    status: 'Open source · MIT',
+    image: '/projects/gwen-hero.jpg',
+  },
+  {
     name: 'HustlePocket',
     logo: 'HP',
     logoImage: '/projects/hustlepocket-logo.png',

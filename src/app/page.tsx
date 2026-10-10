@@ -10,6 +10,7 @@ import { Button } from '@/components/Button'
 
 const featuredNames = [
   'Astrolle',
+  'Gwen',
   'HustlePocket',
   'Curated Lovers',
   'Infrapedia',

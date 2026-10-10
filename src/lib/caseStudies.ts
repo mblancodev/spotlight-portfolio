@@ -163,6 +163,33 @@ export const caseStudies: CaseStudy[] = [
       'Built with React, TypeScript, Vite, and Tailwind CSS on the front end, Express and Appwrite on the back end, React PDF for CV generation, MCP for agent access, and a Chrome extension for capture.',
   },
   {
+    slug: 'gwen',
+    title: 'Gwen',
+    description:
+      'An open-source macOS app for dictation and translation in any app, with local Whisper speech-to-text and on-device translation.',
+    draft: false,
+    problem:
+      'Dictation tools for the Mac are either tied to one app or send your voice to a server. I wanted to hold a key in any app, speak, and get clean text at the cursor, and to translate a selection or what I say, without audio or text leaving the machine.',
+    role: 'Sole developer, end to end. I designed the product and built the macOS app, the listener, the punctuation rules, the translation flow, and the marketing site.',
+    constraints: [
+      'Local by default. Speech-to-text, punctuation, and translation run on the Mac. The one step that can leave it is opt-in and off.',
+      'Any app. There is no plugin per editor, so the text has to land in whatever field has focus, including terminals.',
+      'Never worse than what you said. Cleanup can add marks and fix spellings, but it cannot rewrite the take.',
+    ],
+    decisions: [
+      'Two processes. A Swift app owns the keys, the microphone, the bottom bar, and the paste. A Python listener owns segmenting, Whisper, and text cleanup. The app writes 16 kHz audio into a FIFO and the listener reads it.',
+      'Punctuation is rules, not a model. Spoken commands such as “new paragraph” come first, then each sentence gets its marks from its wording, in English and Spanish. A text no rule touches comes back byte for byte.',
+      'Paste where the cursor is, and say so when it can’t. The clipboard is saved, used for the paste, and restored. With no text field in focus, the bar shows the text as copied instead of dropping it. In a terminal, line breaks are flattened so a dictation never runs a command.',
+      'Learn from fixes. After a paste Gwen reads the field back while you are in it. The same spelling fixed twice becomes a rule, stored in a private file under ~/.gwen. Nothing is logged or sent.',
+      'Translation uses Apple’s on-device framework, so it needs macOS 15 and no API key. Language detection is limited to Gwen’s six languages, so a short Spanish phrase is not misread as another language.',
+      'Agent polish is opt-in. A local agent CLI can tidy each take, with no tools and a cost cap per take. If it is missing, slow, or changes what you said, the rules result is kept.',
+    ],
+    outcome:
+      'Gwen is open source under the MIT license. It dictates into any app with a held key, a double tap, or “Hey Gwen”, translates a selection in place or what you say, and exposes a gwen:// URL scheme so other apps can start a dictation or a translation. It installs with one line from its site, gwen-chi.vercel.app.',
+    stack:
+      'Built with Swift and AppKit, Python, whisper.cpp, Apple’s Translation and NaturalLanguage frameworks, and the macOS Accessibility API.',
+  },
+  {
     slug: 'michelleos',
     title: 'MichelleOS',
     description:

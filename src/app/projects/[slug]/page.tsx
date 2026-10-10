@@ -2,6 +2,7 @@ import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { CaseStudy } from '@/components/CaseStudy'
+import { GwenShowcase } from '@/components/GwenShowcase'
 import { HustlePocketShowcase } from '@/components/HustlePocketShowcase'
 import { ProjectWall } from '@/components/ProjectWall'
 import { getCaseStudy, isCaseStudyPublic } from '@/lib/caseStudies'
@@ -50,10 +51,16 @@ export default function PersonalProjectPage({
     notFound()
   }
 
+  // Project-specific sections, keyed by case study slug.
+  let extras: Record<string, React.ReactNode> = {
+    hustlepocket: <HustlePocketShowcase />,
+    gwen: <GwenShowcase />,
+  }
+
   return (
     <CaseStudy
       study={study}
-      extra={params.slug === 'hustlepocket' ? <HustlePocketShowcase /> : null}
+      extra={extras[params.slug]}
       aside={
         <ProjectWall
           slug={params.slug}
